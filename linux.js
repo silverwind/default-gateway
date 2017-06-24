@@ -2,14 +2,13 @@
 
 const net = require("net");
 const exec = require("child_process").exec;
-const dests = ["default", "0.0.0.0", "0.0.0.0/0", "::", "::/0"];
 
-module.exports = cmd => {
+const get = cmd => {
   return new Promise(function(resolve, reject) {
     exec(cmd, function(_, stdout) {
       (stdout || "").trim().split("\n").some(line => {
-        const [target, gateway, iface] = line.split(" ");
-        if (dests.includes(target) && gateway && net.isIP(gateway)) {
+        const [_, gatway, iface] = /default via (.+?) dev (.+)(?: |$)/.exec(line);
+        if (gateway && net.isIP(gateway)) {
           resolve({gateway: gateway, interface: (iface ? iface : null)});
           return true;
         }
@@ -18,3 +17,6 @@ module.exports = cmd => {
     });
   });
 };
+
+module.exports.v4 = () => get("ip -4 r'");
+module.exports.v6 = () => get("ip -6 r");
