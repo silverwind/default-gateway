@@ -5,7 +5,7 @@ const ipRegex = require("ip-regex");
 
 function wmic(proto) {
   return new Promise(function(resolve, reject) {
-    let gateway, gwid, iface;
+    let gateway, gwid;
     exec("wmic path Win32_NetworkAdapterConfiguration where IPEnabled=true get DefaultIPGateway,Index /format:table", function(_, gwtable) {
       exec("wmic path Win32_NetworkAdapter get Index,NetConnectionID /format:table", function(_, iftable) {
         gwtable.trim().split("\n").splice(1).some(function(line) {
@@ -20,9 +20,8 @@ function wmic(proto) {
           const spaceIndex = line.indexOf(" ");
           const id = line.substr(0, spaceIndex).trim();
           const name = line.substr(spaceIndex + 1).trim();
-          if (id === gwid && name) {
-            iface = name;
-            resolve({gateway: gateway, interface: iface});
+          if (id === gwid) {
+            resolve({gateway: gateway, interface: name ? name : null});
             return true;
           }
         });
