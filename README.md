@@ -10,12 +10,14 @@ $ npm install --save default-gateway
 ```
 ## Example
 ```js
-const defaultGateway = require("default-gateway");
+const defaultGateway = require('default-gateway');
+
 defaultGateway.v4().then(result => {
-  // result is {gateway: '1.2.3.4', interface: 'en1'}
+  //=> {gateway: '1.2.3.4', interface: 'en1'}
 });
+
 defaultGateway.v6().then(result => {
-  // result is {gateway: '2001:d8::1', interface: 'en2'}
+  //=> {gateway: '2001:db8::1', interface: 'en2'}
 });
 ```
 
