@@ -3,12 +3,17 @@
 const exec = require("child_process").exec;
 const ipRegex = require("ip-regex");
 
+const gwCmd = "wmic path Win32_NetworkAdapterConfiguration where IPEnabled=true get DefaultIPGateway,Index /format:table";
+const ifCmd = "wmic path Win32_NetworkAdapter get Index,NetConnectionID /format:table";
+
 function wmic(proto) {
   return new Promise(function(resolve, reject) {
     let gateway, gwid;
-    exec("wmic path Win32_NetworkAdapterConfiguration where IPEnabled=true get DefaultIPGateway,Index /format:table", function(_, gwtable) {
-      exec("wmic path Win32_NetworkAdapter get Index,NetConnectionID /format:table", function(_, iftable) {
-        gwtable.trim().split("\n").splice(1).some(function(line) {
+    exec(gwCmd, function(err, gwTable) {
+      if (err) return reject(err);
+      exec(ifCmd, function(err, ifTable) {
+        if (err) return reject(err);
+        (gwTable || "").trim().split("\n").splice(1).some(function(line) {
           const [gw, id] = line.trim().split(/} +/);
           gateway = (ipRegex[proto]().exec((gw || "").trim()) || [])[0];
           if (gateway) {
@@ -16,10 +21,10 @@ function wmic(proto) {
             return true;
           }
         });
-        iftable.trim().split("\n").splice(1).some(function(line) {
-          const spaceIndex = line.indexOf(" ");
-          const id = line.substr(0, spaceIndex).trim();
-          const name = line.substr(spaceIndex + 1).trim();
+        (ifTable || "").trim().split("\n").splice(1).some(function(line) {
+          const i = line.indexOf(" ");
+          const id = line.substr(0, i).trim();
+          const name = line.substr(i + 1).trim();
           if (id === gwid) {
             resolve({gateway: gateway, interface: name ? name : null});
             return true;
