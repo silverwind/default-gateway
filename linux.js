@@ -8,7 +8,7 @@ const get = cmd => {
     exec(cmd, function(err, stdout) {
       if (err) return reject(err);
       (stdout || "").trim().split("\n").some(line => {
-        const [_, gateway, iface] = /default via (.+?) dev (.+?)( |$)/.exec(line);
+        const [_, gateway, iface] = /default via (.+?) dev (.+?)( |$)/.exec(line) || [];
         if (gateway && net.isIP(gateway)) {
           resolve({gateway: gateway, interface: (iface ? iface : null)});
           return true;
