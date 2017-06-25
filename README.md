@@ -24,10 +24,10 @@ defaultGateway.v6().then(result => {
 ## API
 ### default-gateway.v4()
 
-Returns a promise that resolves to a object containing the IPv4 `gateway` and `interface`. If it succeeds, `gateway` will always be defined, while `interface` can be absent. Rejects when the gateway cannot be determined.
+Returns a promise that resolves to a object containing the IPv4 `gateway` and `interface`. If it succeeds, `gateway` will always be defined, while `interface` can be `null` if it cannot be determined. Rejects when the gateway cannot be determined.
 
 ### default-gateway.v6()
 
-Returns a promise that resolves to a object containing the IPv6 `gateway` and `interface`. If it succeeds, `gateway` will always be defined, while `interface` can be absent. Rejects when the gateway cannot be determined.
+Returns a promise that resolves to a object containing the IPv6 `gateway` and `interface`. If it succeeds, `gateway` will always be defined, while `interface` can be `null` if it cannot be determined. Rejects when the gateway cannot be determined.
 
 © [silverwind](https://github.com/silverwind), distributed under BSD licence
