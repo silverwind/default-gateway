@@ -9,7 +9,7 @@
     "test": "make test"
   },
   "engines": {
-    "node": ">=4"
+    "node": ">=6"
   },
   "dependencies": {
     "ip-regex": "^2.1.0"
