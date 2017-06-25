@@ -21,7 +21,8 @@
   ],
   "files": [
     "index.js",
-    "unix.js",
+    "darwin.js",
+    "linux.js",
     "win32.js"
   ],
   "keywords": [
