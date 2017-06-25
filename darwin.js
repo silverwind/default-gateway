@@ -4,12 +4,17 @@ const net = require("net");
 const exec = require("child_process").exec;
 const dests = ["default", "0.0.0.0", "0.0.0.0/0", "::", "::/0"];
 
-const get = cmd => {
+const get = (cmd, family) => {
   return new Promise(function(resolve, reject) {
     exec(cmd, function(err, stdout) {
       if (err) return reject(err);
       (stdout || "").trim().split("\n").some(line => {
-        const [target, gateway, iface] = line.split(" ");
+        let target, gateway, _flags, _ref, _use, iface;
+        if (family === "v4") {
+          [target, gateway, _flags, _ref, _use, iface] = line.split(/ +/);
+        } else {
+          [target, gateway, _flags, iface] = line.split(/ +/);
+        }
         if (dests.includes(target) && gateway && net.isIP(gateway)) {
           resolve({gateway: gateway, interface: (iface ? iface : null)});
           return true;
@@ -20,5 +25,5 @@ const get = cmd => {
   });
 };
 
-module.exports.v4 = () => get("netstat -rn -f inet | awk '{print $1,$2,$6;}'");
-module.exports.v6 = () => get("netstat -rn -f inet6 | awk '{print $1,$2,$4;}'");
+module.exports.v4 = () => get("netstat -rn -f inet", "v4");
+module.exports.v6 = () => get("netstat -rn -f inet6", "v6");
