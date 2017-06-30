@@ -187,7 +187,7 @@ rules:
   prefer-numeric-literals: [2]
   prefer-rest-params: [0]
   quote-props: [0]
-  quotes: [2, double, avoid-escape]
+  quotes: [2, double, {avoidEscape: true, allowTemplateLiterals: true}]
   radix: [2, as-needed]
   require-jsdoc: [0]
   require-yield: [2]
