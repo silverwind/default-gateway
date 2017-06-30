@@ -4,8 +4,8 @@ const net = require("net");
 const exec = require("child_process").exec;
 
 const get = cmd => {
-  return new Promise(function(resolve, reject) {
-    exec(cmd, function(err, stdout) {
+  return new Promise((resolve, reject) => {
+    exec(cmd, (err, stdout) => {
       if (err) return reject(err);
       (stdout || "").trim().split("\n").some(line => {
         const [_, gateway, iface] = /default via (.+?) dev (.+?)( |$)/.exec(line) || [];

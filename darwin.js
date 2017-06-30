@@ -5,8 +5,8 @@ const exec = require("child_process").exec;
 const dests = ["default", "0.0.0.0", "0.0.0.0/0", "::", "::/0"];
 
 const get = (cmd, family) => {
-  return new Promise(function(resolve, reject) {
-    exec(cmd, function(err, stdout) {
+  return new Promise((resolve, reject) => {
+    exec(cmd, (err, stdout) => {
       if (err) return reject(err);
       (stdout || "").trim().split("\n").some(line => {
         let target, gateway, _flags, _ref, _use, iface;
