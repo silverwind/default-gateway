@@ -7,13 +7,13 @@ const gwCmd = "wmic path Win32_NetworkAdapterConfiguration where IPEnabled=true 
 const ifCmd = "wmic path Win32_NetworkAdapter get Index,NetConnectionID /format:table";
 
 function wmic(proto) {
-  return new Promise(function(resolve, reject) {
+  return new Promise((resolve, reject) => {
     let gateway, gwid;
-    exec(gwCmd, function(err, gwTable) {
+    exec(gwCmd, (err, gwTable) => {
       if (err) return reject(err);
-      exec(ifCmd, function(err, ifTable) {
+      exec(ifCmd, (err, ifTable) => {
         if (err) return reject(err);
-        (gwTable || "").trim().split("\n").splice(1).some(function(line) {
+        (gwTable || "").trim().split("\n").splice(1).some(line => {
           const [gw, id] = line.trim().split(/} +/);
           gateway = (ipRegex[proto]().exec((gw || "").trim()) || [])[0];
           if (gateway) {
@@ -21,7 +21,7 @@ function wmic(proto) {
             return true;
           }
         });
-        (ifTable || "").trim().split("\n").splice(1).some(function(line) {
+        (ifTable || "").trim().split("\n").splice(1).some(line => {
           const i = line.indexOf(" ");
           const id = line.substr(0, i).trim();
           const name = line.substr(i + 1).trim();
