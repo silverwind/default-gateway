@@ -3,12 +3,18 @@
 const execa = require("execa");
 const ipRegex = require("ip-regex");
 
-const gwCmd = "wmic path Win32_NetworkAdapterConfiguration where IPEnabled=true get DefaultIPGateway,Index /format:table";
-const ifCmd = "wmic path Win32_NetworkAdapter get Index,NetConnectionID /format:table";
+const gwArgs = "path Win32_NetworkAdapterConfiguration where IPEnabled=true get DefaultIPGateway,Index /format:table".split(" ");
+const ifArgs = "path Win32_NetworkAdapter get Index,NetConnectionID /format:table".split(" ");
 
 function wmic(family) {
   let gateway, gwid, result;
-  return execa.stdout(gwCmd, gwTable => {
+
+  return Promise.all([
+    execa.stdout("wmic", gwArgs),
+    execa.stdout("wmic", ifArgs),
+  ]).then(results => {
+    const [gwTable, ifTable] = results;
+
     (gwTable || "").trim().split("\n").splice(1).some(line => {
       const [gw, id] = line.trim().split(/} +/);
       gateway = (ipRegex[family]().exec((gw || "").trim()) || [])[0];
@@ -17,7 +23,7 @@ function wmic(family) {
         return true;
       }
     });
-  }).then(execa.stdout(ifCmd, ifTable => {
+
     (ifTable || "").trim().split("\n").splice(1).some(line => {
       const i = line.indexOf(" ");
       const id = line.substr(0, i).trim();
@@ -27,7 +33,7 @@ function wmic(family) {
         return true;
       }
     });
-  })).then(() => {
+
     if (!result) {
       throw new Error("Unable to determine default gateway");
     }
