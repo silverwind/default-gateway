@@ -4,8 +4,8 @@ const net = require("net");
 const execa = require("execa");
 
 const args = {
-  v4: ["-4", "-r"],
-  v6: ["-6", "-r"],
+  v4: ["-4", "r"],
+  v6: ["-6", "r"],
 };
 
 const get = family => {
