@@ -1,5 +1,9 @@
 "use strict";
 
+// travis VMs don't have IPs on their interfaces
+// https://docs.travis-ci.com/user/ci-environment/#Networking
+if (process.env.CI) return;
+
 const assert = require("assert");
 const net = require("net");
 const defaultGateway = require(".");
