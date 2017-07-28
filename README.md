@@ -3,7 +3,7 @@
 
 > Get the default network gateway, cross-platform.
 
-Obtains the network gateway through `exec` calls to OS routing interfaces. Supports Linux, macOS and Windows. On Linux, the `ip` command must be available (usually provided by the `iproute2` package).
+Obtains the machine's default gateway through `exec` calls to OS routing interfaces. Supports Linux, macOS and Windows. On Linux, the `ip` command must be available (usually provided by the `iproute2` package).
 
 ## Installation
 
@@ -29,12 +29,11 @@ defaultGateway.v6().then(result => {
 
 ### defaultGateway.v4()
 
-Returns a promise that resolves to a object containing the IPv4 `gateway` and `interface`. If it succeeds, `gateway` will always be defined, while `interface` can be `null` if it cannot be determined. Rejects when the gateway cannot be determined.
+Returns a promise that resolves to a object containing the IPv4 `gateway` and `interface` properties. If it succeeds, `gateway` will always be defined, while `interface` can be `null` if it cannot be determined. Rejects when the gateway cannot be determined.
 
 ### defaultGateway.v6()
 
-Returns a promise that resolves to a object containing the IPv6 `gateway` and `interface`. If it succeeds, `gateway` will always be defined, while `interface` can be `null` if it cannot be determined. Rejects when the gateway cannot be determined.
-
+Returns a promise that resolves to a object containing the IPv6 `gateway` and `interface` properties. If it succeeds, `gateway` will always be defined, while `interface` can be `null` if it cannot be determined. Rejects when the gateway cannot be determined.
 
 ## License
 
