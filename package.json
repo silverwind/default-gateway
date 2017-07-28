@@ -16,13 +16,13 @@
     "ip-regex": "^2.1.0"
   },
   "os": [
-    "win32",
     "darwin",
-    "linux"
+    "linux",
+    "win32"
   ],
   "files": [
-    "index.js",
     "darwin.js",
+    "index.js",
     "linux.js",
     "win32.js"
   ],
