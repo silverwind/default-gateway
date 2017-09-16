@@ -14,7 +14,7 @@ const get = family => {
     let result;
 
     (stdout || "").trim().split("\n").some(line => {
-      const results =  line.split(/ +/) || [];
+      const results = line.split(/ +/) || [];
       const target = results[0];
       const gateway = results[1];
       const iface = results[3];
