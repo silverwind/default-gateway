@@ -25,7 +25,8 @@
     "darwin.js",
     "index.js",
     "linux.js",
-    "win32.js"
+    "win32.js",
+    "android.js"
   ],
   "keywords": [
     "default gateway",
