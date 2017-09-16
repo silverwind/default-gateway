@@ -13,10 +13,13 @@ function wmic(family) {
     execa.stdout("wmic", gwArgs),
     execa.stdout("wmic", ifArgs),
   ]).then(results => {
-    const [gwTable, ifTable] = results;
+    const gwTable = results[0];
+    const ifTable = results[1];
 
     (gwTable || "").trim().split("\n").splice(1).some(line => {
-      const [gw, id] = line.trim().split(/} +/);
+      const results = line.trim().split(/} +/);
+      const gw = results[0];
+      const id = results[1];
       gateway = (ipRegex[family]().exec((gw || "").trim()) || [])[0];
       if (gateway) {
         gwid = id;

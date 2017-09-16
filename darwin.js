@@ -14,13 +14,11 @@ const get = family => {
     let result;
 
     (stdout || "").trim().split("\n").some(line => {
-      let target, gateway, _flags, _ref, _use, iface;
-      if (family === "v4") {
-        [target, gateway, _flags, _ref, _use, iface] = line.split(/ +/) || [];
-      } else {
-        [target, gateway, _flags, iface] = line.split(/ +/) || [];
-      }
-      if (dests.includes(target) && gateway && net.isIP(gateway)) {
+      const results =  line.split(/ +/) || [];
+      const target = results[0];
+      const gateway = results[1];
+      const iface = results[family === "v4" ? 5 : 3];
+      if (dests.indexOf(target) !== -1 && gateway && net.isIP(gateway)) {
         result = {gateway: gateway, interface: (iface ? iface : null)};
         return true;
       }
