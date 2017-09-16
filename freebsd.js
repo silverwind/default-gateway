@@ -14,12 +14,7 @@ const get = family => {
     let result;
 
     (stdout || "").trim().split("\n").some(line => {
-      let target, gateway, _flags, iface;
-      if (family === "v4") {
-        [target, gateway, _flags, iface] = line.split(/ +/) || [];
-      } else {
-        [target, gateway, _flags, iface] = line.split(/ +/) || [];
-      }
+      const [target, gateway, _flags, iface] = line.split(/ +/) || [];
       if (dests.includes(target) && gateway && net.isIP(gateway)) {
         result = {gateway: gateway, interface: (iface ? iface : null)};
         return true;
