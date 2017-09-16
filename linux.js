@@ -14,9 +14,9 @@ const get = family => {
     let result;
 
     (stdout || "").trim().split("\n").some(line => {
-      const results = /default( via .+?)?( dev .+?)( |$)/.exec(line);
-      const gateway = ((results || [])[1] || "").substring(5);
-      const iface = ((results || [])[2] || "").substring(5);
+      const results = /default( via .+?)?( dev .+?)( |$)/.exec(line) || [];
+      const gateway = (results[1] || "").substring(5);
+      const iface = (results[2] || "").substring(5);
       if (gateway && net.isIP(gateway)) { // default via 1.2.3.4 dev en0
         result = {gateway: gateway, interface: (iface ? iface : null)};
         return true;
