@@ -2,7 +2,7 @@
 
 const platform = require("os").platform();
 
-if (["linux", "darwin", "win32", "android", "freebsd"].includes(platform)) {
+if (["android", "darwin", "freebsd", "linux", "win32"].includes(platform)) {
   module.exports.v4 = () => require(`./${platform}`).v4();
   module.exports.v6 = () => require(`./${platform}`).v6();
 } else {
