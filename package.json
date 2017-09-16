@@ -16,19 +16,19 @@
     "ip-regex": "^2.1.0"
   },
   "os": [
-    "darwin",
-    "linux",
-    "win32",
     "android",
-    "freebsd"
+    "darwin",
+    "freebsd",
+    "linux",
+    "win32"
   ],
   "files": [
-    "darwin.js",
     "index.js",
-    "linux.js",
-    "win32.js",
     "android.js",
-    "freebsd.js"
+    "darwin.js",
+    "freebsd.js",
+    "linux.js",
+    "win32.js"
   ],
   "keywords": [
     "default gateway",
