@@ -13,7 +13,9 @@ const get = family => {
     let result;
 
     (stdout || "").trim().split("\n").some(line => {
-      const [_, gateway, iface] = /default via (.+?) dev (.+?)( |$)/.exec(line) || [];
+      const results = /default via (.+?) dev (.+?)( |$)/.exec(line);
+      const gateway = results[1];
+      const iface = results[2];
       if (gateway && net.isIP(gateway)) {
         result = {gateway: gateway, interface: (iface ? iface : null)};
         return true;

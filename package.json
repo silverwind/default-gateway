@@ -9,7 +9,7 @@
     "test": "make test"
   },
   "engines": {
-    "node": ">=6"
+    "node": ">=4"
   },
   "dependencies": {
     "execa": "^0.7.0",
