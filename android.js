@@ -13,7 +13,7 @@ const get = family => {
     let result;
 
     (stdout || "").trim().split("\n").some(line => {
-      const results = /default via (.+?) dev (.+?)( |$)/.exec(line);
+      const results = /default via (.+?) dev (.+?)( |$)/.exec(line) || [];
       const gateway = results[1];
       const iface = results[2];
       if (gateway && net.isIP(gateway)) {

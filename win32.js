@@ -17,7 +17,7 @@ function wmic(family) {
     const ifTable = results[1];
 
     (gwTable || "").trim().split("\n").splice(1).some(line => {
-      const results = line.trim().split(/} +/);
+      const results = line.trim().split(/} +/) || [];
       const gw = results[0];
       const id = results[1];
       gateway = (ipRegex[family]().exec((gw || "").trim()) || [])[0];
