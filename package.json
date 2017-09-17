@@ -20,6 +20,7 @@
     "darwin",
     "freebsd",
     "linux",
+    "openbsd",
     "win32"
   ],
   "files": [
@@ -28,6 +29,7 @@
     "darwin.js",
     "freebsd.js",
     "linux.js",
+    "openbsd.js",
     "win32.js"
   ],
   "keywords": [
