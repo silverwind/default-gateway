@@ -21,6 +21,7 @@
     "freebsd",
     "linux",
     "openbsd",
+    "sunos",
     "win32"
   ],
   "files": [
@@ -30,6 +31,7 @@
     "freebsd.js",
     "linux.js",
     "openbsd.js",
+    "sunos.js",
     "win32.js"
   ],
   "keywords": [

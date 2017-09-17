@@ -3,7 +3,7 @@
 
 > Get the default network gateway, cross-platform.
 
-Obtains the machine's default gateway through `exec` calls to OS routing interfaces. Supports Linux, macOS and Windows and Android. On Linux and Android, the `ip` command must be available (usually provided by the `iproute2` package).
+Obtains the machine's default gateway through `exec` calls to OS routing interfaces. On Linux and Android, the `ip` command must be available (usually provided by the `iproute2` package).
 
 ## Installation
 
