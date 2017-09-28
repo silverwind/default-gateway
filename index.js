@@ -11,9 +11,16 @@ if ([
   "sunos",
   "win32"
 ].indexOf(platform) !== -1) {
-  module.exports.v4 = () => require(`./${platform}`).v4();
-  module.exports.v6 = () => require(`./${platform}`).v6();
+  const fams = require(`./${platform}`);
+
+  module.exports.v4 = () => fams.v4();
+  module.exports.v6 = () => fams.v6();
+  module.exports.v4.sync = () => fams.v4.sync();
+  module.exports.v6.sync = () => fams.v6.sync();
 } else {
-  module.exports.v4 = () => { throw new Error(`Unsupported Platform: ${platform}`); };
-  module.exports.v6 = () => { throw new Error(`Unsupported Platform: ${platform}`); };
+  const noop = () => { throw new Error(`Unsupported Platform: ${platform}`); };
+  module.exports.v4 = noop;
+  module.exports.v6 = noop;
+  module.exports.v4.sync = noop;
+  module.exports.v6.sync = noop;
 }
