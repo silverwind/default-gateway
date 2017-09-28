@@ -40,7 +40,7 @@ const parse = (stdout, family) => {
   return result;
 };
 
-const get = family => {
+const promise = family => {
   return execa.stdout("ip", args[family]).then(stdout => {
     return parse(stdout, family);
   });
@@ -51,8 +51,8 @@ const sync = family => {
   return parse(result.stdout, family);
 };
 
-module.exports.v4 = () => get("v4");
-module.exports.v6 = () => get("v6");
+module.exports.v4 = () => promise("v4");
+module.exports.v6 = () => promise("v6");
 
 module.exports.v4.sync = () => sync("v4");
 module.exports.v6.sync = () => sync("v6");

@@ -37,7 +37,7 @@ const parse = (gwTable, ifTable, family) => {
   return result;
 };
 
-const wmic = family => {
+const promise = family => {
   return Promise.all([
     execa.stdout("wmic", gwArgs),
     execa.stdout("wmic", ifArgs),
@@ -56,8 +56,8 @@ const sync = family => {
   return parse(gwTable, ifTable, family);
 };
 
-module.exports.v4 = () => wmic("v4");
-module.exports.v6 = () => wmic("v6");
+module.exports.v4 = () => promise("v4");
+module.exports.v6 = () => promise("v6");
 
 module.exports.v4.sync = () => sync("v4");
 module.exports.v6.sync = () => sync("v6");
