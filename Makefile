@@ -1,5 +1,5 @@
 lint:
-	eslint *.js
+	node_modules/.bin/eslint *.js
 
 test:
 	$(MAKE) lint && node --trace-deprecation --throw-deprecation test.js
