@@ -18,3 +18,13 @@ Promise.all([
   console.error(err.stack);
   process.exit(1);
 });
+
+if (defaultGateway.v4.sync) {
+  const result = defaultGateway.v4.sync();
+  assert(net.isIPv4(result.gateway));
+}
+
+if (defaultGateway.v6.sync) {
+  const result = defaultGateway.v6.sync();
+  assert(net.isIPv6(result.gateway));
+}

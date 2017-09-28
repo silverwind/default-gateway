@@ -41,5 +41,8 @@
     "gateway",
     "routing",
     "route"
-  ]
+  ],
+  "devDependencies": {
+    "eslint": "^4.7.2"
+  }
 }
