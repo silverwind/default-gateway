@@ -41,9 +41,9 @@ Returns: `result` *Object*
   - `gateway`: The IP address of the default gateway.
   - `interface`: The name of the interface. On Windows, this is the network adapter name.
 
-The `.v{4,6}()` functions return a Promise while the `.v{4,6}().sync()` variants will return the result synchronously.
+The `.v{4,6}()` methods return a Promise while the `.v{4,6}().sync()` variants will return the result synchronously.
 
-The `gateway` property will always be defined on success, while `interface` can be `null` if it cannot be determined. All methods reject/throws when the gateway cannot be determined or the `exec` call failed.
+The `gateway` property will always be defined on success, while `interface` can be `null` if it cannot be determined. All methods reject/throw when the gateway cannot be determined or the `exec` call failed.
 
 ## License
 
