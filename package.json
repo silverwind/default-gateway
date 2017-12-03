@@ -16,7 +16,8 @@
     "ip-regex": "^2.1.0"
   },
   "devDependencies": {
-    "eslint": "^4.8.0"
+    "eslint": "^4.8.0",
+    "updates": "^1.2.6"
   },
   "os": [
     "android",
