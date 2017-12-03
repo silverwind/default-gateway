@@ -9,7 +9,7 @@ publish:
 	npm publish
 
 update:
-	ncu --packageFile package.json -ua
+	node_modules/.bin/updates -u
 	rm -rf node_modules
 	yarn
 
