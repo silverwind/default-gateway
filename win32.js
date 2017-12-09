@@ -50,8 +50,8 @@ const promise = family => {
 };
 
 const sync = family => {
-  const gwTable = execa.sync("wmic", gwArgs);
-  const ifTable = execa.sync("wmic", ifArgs);
+  const gwTable = execa.sync("wmic", gwArgs).stdout;
+  const ifTable = execa.sync("wmic", ifArgs).stdout;
 
   return parse(gwTable, ifTable, family);
 };
