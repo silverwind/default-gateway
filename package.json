@@ -12,12 +12,12 @@
     "node": ">=4"
   },
   "dependencies": {
-    "execa": "^0.8.0",
+    "execa": "^0.9.0",
     "ip-regex": "^2.1.0"
   },
   "devDependencies": {
-    "eslint": "^4.12.1",
-    "updates": "^1.2.6"
+    "eslint": "^4.16.0",
+    "updates": "^2.1.0"
   },
   "os": [
     "android",
