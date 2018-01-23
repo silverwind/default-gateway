@@ -2,7 +2,8 @@ lint:
 	node_modules/.bin/eslint *.js
 
 test:
-	$(MAKE) lint && node --trace-deprecation --throw-deprecation test.js
+	$(MAKE) lint
+	node --trace-deprecation --throw-deprecation test.js
 
 publish:
 	git push -u --tags origin master
