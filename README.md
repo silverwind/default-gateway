@@ -1,20 +1,21 @@
 # default-gateway
-[![](https://img.shields.io/npm/v/default-gateway.svg?style=flat)](https://www.npmjs.org/package/default-gateway) [![](https://img.shields.io/npm/dm/default-gateway.svg)](https://www.npmjs.org/package/default-gateway) [![](https://api.travis-ci.org/silverwind/default-gateway.svg?style=flat)](https://travis-ci.org/silverwind/default-gateway)
 
 > Get the default network gateway, cross-platform.
+
+It fork from [silverwind](https://github.com/silverwind), for hide popup window run with pm2.
 
 Obtains the machine's default gateway through `exec` calls to OS routing interfaces. On Linux and Android, the `ip` command must be available (usually provided by the `iproute2` package).
 
 ## Installation
 
 ```
-$ npm install default-gateway
+$ npm install @penggy/default-gateway
 ```
 
 ## Example
 
 ```js
-const defaultGateway = require('default-gateway');
+const defaultGateway = require('@penggy/default-gateway');
 
 defaultGateway.v4().then(result => {
   // result = {gateway: '1.2.3.4', interface: 'en1'}

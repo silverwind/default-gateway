@@ -1,9 +1,12 @@
 {
-  "name": "default-gateway",
+  "name": "@penggy/default-gateway",
   "version": "2.6.3",
-  "description": "Get the default network gateway, cross-platform.",
-  "author": "silverwind <me@silverwind.io>",
-  "repository": "silverwind/default-gateway",
+  "description": "fork silverwind/default-gateway for hide popup window run with pm2",
+  "author": "penggy <peng.wu@foxmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/penggy/default-gateway.git"
+  },
   "license": "BSD-2-Clause",
   "scripts": {
     "test": "make test"
@@ -45,5 +48,8 @@
     "gateway",
     "routing",
     "route"
-  ]
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
 }
