@@ -37,14 +37,14 @@ const parse = (gwTable, ifTable, family) => {
   return result;
 };
 
+const spawnOpts = {
+  windowsHide: true,
+};
+
 const promise = family => {
   return Promise.all([
-    execa.stdout("wmic", gwArgs, {
-      windowsHide: true
-    }),
-    execa.stdout("wmic", ifArgs, {
-       windowsHide: true
-    }),
+    execa.stdout("wmic", gwArgs, spawnOpts),
+    execa.stdout("wmic", ifArgs, spawnOpts),
   ]).then(results => {
     const gwTable = results[0];
     const ifTable = results[1];
@@ -54,12 +54,8 @@ const promise = family => {
 };
 
 const sync = family => {
-  const gwTable = execa.sync("wmic", gwArgs, {
-     windowsHide: true
-  }).stdout;
-  const ifTable = execa.sync("wmic", ifArgs, {
-     windowsHide: true
-  }).stdout;
+  const gwTable = execa.sync("wmic", gwArgs, spawnOpts).stdout;
+  const ifTable = execa.sync("wmic", ifArgs, spawnOpts).stdout;
 
   return parse(gwTable, ifTable, family);
 };
