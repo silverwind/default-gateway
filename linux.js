@@ -24,7 +24,7 @@ const parse = (stdout, family) => {
       const addresses = interfaces[iface];
       if (!addresses || !addresses.length) return;
 
-      addresses.some(function(addr) {
+      addresses.some(addr => {
         if (addr.family.substring(2) === family && net.isIP(addr.address)) {
           result = {gateway: addr.address, interface: (iface ? iface : null)};
           return true;
