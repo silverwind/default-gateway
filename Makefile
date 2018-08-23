@@ -1,18 +1,18 @@
 lint:
-	node_modules/.bin/eslint *.js
+	npx eslint *.js
 
 test:
 	$(MAKE) lint
-	node --trace-deprecation --throw-deprecation test.js
+	node --pending-deprecation --trace-deprecation --throw-deprecation --trace-warnings test.js
 
 publish:
 	git push -u --tags origin master
 	npm publish
 
 update:
-	node_modules/.bin/updates -u
+	npx updates -u -e ip-regex
 	rm -rf node_modules
-	yarn
+	npm i
 
 npm-patch:
 	npm version patch
