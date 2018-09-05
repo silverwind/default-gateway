@@ -14,17 +14,17 @@ update:
 	rm -rf node_modules
 	npm i
 
-npm-patch:
-	npm version patch
+ver-patch:
+	npx ver patch
 
-npm-minor:
-	npm version minor
+ver-minor:
+	npx ver minor
 
-npm-major:
-	npm version major
+ver-major:
+	npx ver major
 
-patch: lint test npm-patch publish
-minor: lint test npm-minor publish
-major: lint test npm-major publish
+patch: lint test ver-patch publish
+minor: lint test ver-minor publish
+major: lint test ver-major publish
 
 .PHONY: lint test publish update npm-patch npm-minor npm-major patch minor major

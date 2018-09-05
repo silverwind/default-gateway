@@ -18,7 +18,8 @@
   "devDependencies": {
     "eslint": "^5.5.0",
     "eslint-config-silverwind": "^2.0.9",
-    "updates": "^4.3.0"
+    "updates": "^4.3.0",
+    "ver": "2.0.0"
   },
   "os": [
     "android",
