@@ -15,6 +15,9 @@
     "execa": "^1.0.0",
     "ip-regex": "^2.1.0"
   },
+  "optionalDependencies": {
+    "idb-connector": "^1.1.8"
+  },
   "devDependencies": {
     "eslint": "^5.5.0",
     "eslint-config-silverwind": "^2.0.9",
@@ -28,7 +31,8 @@
     "linux",
     "openbsd",
     "sunos",
-    "win32"
+    "win32",
+    "aix"
   ],
   "files": [
     "index.js",
@@ -38,7 +42,8 @@
     "linux.js",
     "openbsd.js",
     "sunos.js",
-    "win32.js"
+    "win32.js",
+    "aix.js"
   ],
   "keywords": [
     "default gateway",

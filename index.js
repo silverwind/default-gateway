@@ -9,7 +9,8 @@ if ([
   "linux",
   "openbsd",
   "sunos",
-  "win32"
+  "win32",
+  "aix"
 ].indexOf(platform) !== -1) {
   const families = require(`./${platform}`);
   module.exports.v4 = () => families.v4();
