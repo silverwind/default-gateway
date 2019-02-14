@@ -2,7 +2,7 @@
 
 const getSqlStatement = family => {
   let sql =
-    "select NEXT_HOP from QSYS2.NETSTAT_ROUTE_INFO where ROUTE_TYPE='DFTROUTE'";
+    "select NEXT_HOP, LOCAL_BINDING_INTERFACE from QSYS2.NETSTAT_ROUTE_INFO where ROUTE_TYPE='DFTROUTE' and NEXT_HOP!='*DIRECT'";
 
   if (family === "v4") {
     sql += " and CONNECTION_TYPE='IPV4'";
@@ -15,48 +15,65 @@ const getSqlStatement = family => {
 
 const getGatewayInformationAsync = async family => {
   return new Promise((resolve, reject) => {
-    const idbConnector = require("idb-connector");
-    const dbconn = new idbConnector.dbconn();
-    dbconn.conn("*LOCAL");
+    try {
+      const idbConnector = require("idb-connector");
 
-    const sql = getSqlStatement(family);
+      const dbconn = new idbConnector.dbconn();
+      dbconn.conn("*LOCAL");
 
-    const stmt = new idbConnector.dbstmt(dbconn);
+      const sql = getSqlStatement(family);
+      const stmt = new idbConnector.dbstmt(dbconn);
 
-    stmt.exec(sql, async results => {
-      stmt.close();
-      dbconn.disconn();
-      dbconn.close();
+      stmt.exec(sql, async results => {
+        try {
+          stmt.close();
+          dbconn.disconn();
+          dbconn.close();
+        } catch (err) {
+          reject(new Error("Unable to determine default gateway"));
+          return;
+        }
 
-      if (results && results[0] && results[0].NEXT_HOP) {
-        resolve({
-          gateway: results[0].NEXT_HOP
-        });
-      } else {
-        reject(new Error("Unable to determine default gateway"));
-      }
-    });
+        if (results && results[0] && results[0].NEXT_HOP) {
+          resolve({
+            gateway: results[0].NEXT_HOP,
+            interface: results[0].LOCAL_BINDING_INTERFACE || ""
+          });
+        } else {
+          reject(new Error("Unable to determine default gateway"));
+        }
+      });
+    } catch (err) {
+      reject(new Error("Unable to determine default gateway"));
+      return;
+    }
   });
 };
 
 const getGatewayInformationSync = family => {
-  const idbConnector = require("idb-connector");
-  const dbconn = new idbConnector.dbconn();
-  dbconn.conn("*LOCAL");
+  let results;
+  try {
+    const idbConnector = require("idb-connector");
 
-  const sql = getSqlStatement(family);
+    const dbconn = new idbConnector.dbconn();
+    dbconn.conn("*LOCAL");
 
-  const stmt = new idbConnector.dbstmt(dbconn);
+    const sql = getSqlStatement(family);
+    const stmt = new idbConnector.dbstmt(dbconn);
 
-  const results = stmt.execSync(sql);
+    results = stmt.execSync(sql);
 
-  stmt.close();
-  dbconn.disconn();
-  dbconn.close();
+    stmt.close();
+    dbconn.disconn();
+    dbconn.close();
+  } catch (err) {
+    throw new Error("Unable to determine default gateway");
+  }
 
   if (results && results[0] && results[0].NEXT_HOP) {
     return {
-      gateway: results[0].NEXT_HOP
+      gateway: results[0].NEXT_HOP,
+      interface: results[0].LOCAL_BINDING_INTERFACE || ""
     };
   } else {
     throw new Error("Unable to determine default gateway");
