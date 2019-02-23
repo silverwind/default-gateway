@@ -7,7 +7,7 @@ const sql = "select NEXT_HOP, LOCAL_BINDING_INTERFACE from QSYS2.NETSTAT_ROUTE_I
 const checkVariant = () => {if (require("os").type() !== "OS400") throw new Error("Unsupported AIX variant"); };
 
 const parse = stdout => {
-  const result;
+  let result = undefined;
   try {
     let resultObj = JSON.parse(stdout);
     const gateway = resultObj.records[0].NEXT_HOP;
