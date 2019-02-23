@@ -43,7 +43,7 @@ Returns: `result` *Object*
 
 The `.v{4,6}()` methods return a Promise while the `.v{4,6}.sync()` variants will return the result synchronously.
 
-The `gateway` property will always be defined on success, while `interface` can be `null` if it cannot be determined. All methods reject/throw when the gateway cannot be determined or the `exec` call failed.
+The `gateway` property will always be defined on success, while `interface` can be `null` if it cannot be determined. All methods reject/throw on unexpected conditions.
 
 ## License
 

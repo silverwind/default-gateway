@@ -21,15 +21,6 @@
     "updates": "^4.3.0",
     "ver": "2.0.0"
   },
-  "os": [
-    "android",
-    "darwin",
-    "freebsd",
-    "linux",
-    "openbsd",
-    "sunos",
-    "win32"
-  ],
   "files": [
     "index.js",
     "android.js",
