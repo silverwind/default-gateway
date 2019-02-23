@@ -11,7 +11,7 @@ const parse = stdout => {
   try {
     const resultObj = JSON.parse(stdout);
     const gateway = resultObj.records[0].NEXT_HOP;
-    const iface = +resultObj.records[0].LOCAL_BINDING_INTERFACE;
+    const iface = resultObj.records[0].LOCAL_BINDING_INTERFACE;
     result = {gateway, iface};
   } catch {}
   if (!result) {
