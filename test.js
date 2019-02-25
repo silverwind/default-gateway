@@ -6,7 +6,12 @@ const assert = require("assert");
 const net = require("net");
 const defaultGateway = require(".");
 
-(async () => {
+const exit = err => {
+  if (err) console.error(err);
+  process.exit(err ? 1 : 0);
+};
+
+const main = async () => {
   const async4 = await defaultGateway.v4();
   assert(net.isIPv4((async4).gateway));
 
@@ -22,4 +27,6 @@ const defaultGateway = require(".");
     const sync6 = defaultGateway.v6.sync();
     assert(net.isIPv6(sync6.gateway));
   }
-})();
+};
+
+main().then(exit).catch(exit);
