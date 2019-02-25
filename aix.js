@@ -19,7 +19,7 @@ const parse = stdout => {
     const gateway = resultObj.records[0].NEXT_HOP;
     const iface = resultObj.records[0].LOCAL_BINDING_INTERFACE;
     result = {gateway, iface};
-  } catch {}
+  } catch (err) {}
   if (!result) {
     throw new Error("Unable to determine default gateway");
   }
