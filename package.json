@@ -29,7 +29,8 @@
     "linux.js",
     "openbsd.js",
     "sunos.js",
-    "win32.js"
+    "win32.js",
+    "aix.js"
   ],
   "keywords": [
     "default gateway",
