@@ -30,7 +30,7 @@
     "openbsd.js",
     "sunos.js",
     "win32.js",
-    "aix.js"
+    "ibmi.js"
   ],
   "keywords": [
     "default gateway",

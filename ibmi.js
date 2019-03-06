@@ -5,13 +5,6 @@ const execa = require("execa");
 const db2util = "/QOpenSys/pkgs/bin/db2util";
 const sql = "select NEXT_HOP, LOCAL_BINDING_INTERFACE from QSYS2.NETSTAT_ROUTE_INFO where ROUTE_TYPE='DFTROUTE' and NEXT_HOP!='*DIRECT' and CONNECTION_TYPE=?";
 
-const checkVariant = () => {
-  const variant = require("os").type();
-  if (variant !== "OS400") {
-    throw new Error(`Unsupported AIX variant: ${variant}`);
-  }
-};
-
 const parse = stdout => {
   let result;
   try {
@@ -27,12 +20,10 @@ const parse = stdout => {
 };
 
 const promise = family => {
-  checkVariant();
   return execa.stdout(db2util, [sql, "-p", family, "-o", "json"]).then(stdout => parse(stdout));
 };
 
 const sync = family => {
-  checkVariant();
   const {stdout} = execa.sync(db2util, [sql, "-p", family, "-o", "json"]);
   return parse(stdout);
 };
