@@ -12,7 +12,11 @@ if ([
   "win32",
   "aix",
 ].indexOf(platform) !== -1) {
-  const families = require(`./${platform}`);
+  let platform_module = `./${platform}`;
+  if(platform === "aix") {
+    platform_module = (require("os").type() === "OS400") ? "./ibmi.js" : "./sunos.js";
+  }
+  const families = require(platform_module);
   module.exports.v4 = () => families.v4();
   module.exports.v6 = () => families.v6();
   module.exports.v4.sync = () => families.v4.sync();
