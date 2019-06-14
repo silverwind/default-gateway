@@ -2,60 +2,73 @@
 
 const execa = require("execa");
 const ipRegex = require("ip-regex");
+const os = require("os");
 
 const gwArgs = "path Win32_NetworkAdapterConfiguration where IPEnabled=true get DefaultIPGateway,Index /format:table".split(" ");
-const ifArgs = "path Win32_NetworkAdapter get Index,NetConnectionID /format:table".split(" ");
-
-const parse = (gwTable, ifTable, family) => {
-  let gateway, gwid, result;
-
-  (gwTable || "").trim().split("\n").splice(1).some(line => {
-    const [gw, id] = line.trim().split(/} +/) || [];
-    gateway = (ipRegex[family]().exec((gw || "").trim()) || [])[0];
-    if (gateway) {
-      gwid = id;
-      return true;
-    }
-  });
-
-  (ifTable || "").trim().split("\n").splice(1).some(line => {
-    const i = line.indexOf(" ");
-    const id = line.substr(0, i).trim();
-    const name = line.substr(i + 1).trim();
-    if (id === gwid) {
-      result = {gateway, interface: name ? name : null};
-      return true;
-    }
-  });
-
-  if (!result) {
-    throw new Error("Unable to determine default gateway");
-  }
-
-  return result;
-};
+const ifArgs = index => `path Win32_NetworkAdapter where Index=${index} get NetConnectionID,MACAddress /format:table`.split(" ");
 
 const spawnOpts = {
   windowsHide: true,
 };
 
-const promise = family => {
-  return Promise.all([
-    execa.stdout("wmic", gwArgs, spawnOpts),
-    execa.stdout("wmic", ifArgs, spawnOpts),
-  ]).then(results => {
-    const gwTable = results[0];
-    const ifTable = results[1];
+function parseGwTable(gwTable, family) {
+  for (const line of (gwTable || "").trim().split("\n").splice(1)) {
+    const [gw, id] = line.trim().split(/} +/) || [];
+    const gateway = (ipRegex[family]().exec((gw || "").trim()) || [])[0];
+    if (gateway) return [gateway, id];
+  }
+}
 
-    return parse(gwTable, ifTable, family);
-  });
+function parseIfTable(ifTable) {
+  const line = (ifTable || "").trim().split("\n")[1];
+
+  let [mac, name] = line.trim().split(/\s+/);
+  mac = mac.toLowerCase();
+
+  // try to get the interface name by matching the mac to os.networkInterfaces to avoid wmic's encoding issues
+  // https://github.com/silverwind/default-gateway/issues/14
+  for (const [osname, addrs] of Object.entries(os.networkInterfaces())) {
+    for (const addr of addrs) {
+      if (addr && addr.mac === mac) {
+        return osname;
+      }
+    }
+  }
+  return name;
+}
+
+const promise = async family => {
+  const gwTable = await execa.stdout("wmic", gwArgs, spawnOpts);
+  const [gateway, id] = parseGwTable(gwTable, family) || [];
+
+  if (!gateway) {
+    throw new Error("Unable to determine default gateway");
+  }
+
+  let name;
+  if (id) {
+    const ifTable = execa.sync("wmic", ifArgs(id), spawnOpts).stdout;
+    name = parseIfTable(ifTable);
+  }
+
+  return {gateway, interface: name ? name : null};
 };
 
 const sync = family => {
   const gwTable = execa.sync("wmic", gwArgs, spawnOpts).stdout;
-  const ifTable = execa.sync("wmic", ifArgs, spawnOpts).stdout;
+  const [gateway, id] = parseGwTable(gwTable, family) || [];
 
-  return parse(gwTable, ifTable, family);
+  if (!gateway) {
+    throw new Error("Unable to determine default gateway");
+  }
+
+  let name;
+  if (id) {
+    const ifTable = execa.sync("wmic", ifArgs(id), spawnOpts).stdout;
+    name = parseIfTable(ifTable);
+  }
+
+  return {gateway, interface: name ? name : null};
 };
 
 module.exports.v4 = () => promise("v4");
