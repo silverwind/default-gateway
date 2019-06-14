@@ -12,9 +12,7 @@ const parse = stdout => {
   let result;
 
   (stdout || "").trim().split("\n").some(line => {
-    const results = /default via (.+?) dev (.+?)( |$)/.exec(line) || [];
-    const gateway = results[1];
-    const iface = results[2];
+    const [_, gateway, iface] = /default via (.+?) dev (.+?)( |$)/.exec(line) || [];
     if (gateway && net.isIP(gateway)) {
       result = {gateway, interface: (iface ? iface : null)};
       return true;

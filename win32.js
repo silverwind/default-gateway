@@ -10,9 +10,7 @@ const parse = (gwTable, ifTable, family) => {
   let gateway, gwid, result;
 
   (gwTable || "").trim().split("\n").splice(1).some(line => {
-    const results = line.trim().split(/} +/) || [];
-    const gw = results[0];
-    const id = results[1];
+    const [gw, id] = line.trim().split(/} +/) || [];
     gateway = (ipRegex[family]().exec((gw || "").trim()) || [])[0];
     if (gateway) {
       gwid = id;

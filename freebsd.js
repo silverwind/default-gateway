@@ -13,11 +13,8 @@ const parse = stdout => {
   let result;
 
   (stdout || "").trim().split("\n").some(line => {
-    const results = line.split(/ +/) || [];
-    const target = results[0];
-    const gateway = results[1];
-    const iface = results[3];
-    if (dests.indexOf(target) !== -1 && gateway && net.isIP(gateway)) {
+    const [target, gateway, _, iface] = line.split(/ +/) || [];
+    if (dests.includes(target) && gateway && net.isIP(gateway)) {
       result = {gateway, interface: (iface ? iface : null)};
       return true;
     }

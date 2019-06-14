@@ -9,7 +9,7 @@
     "test": "eslint *.js && node --pending-deprecation --trace-deprecation --throw-deprecation --trace-warnings test.js"
   },
   "engines": {
-    "node": ">=6"
+    "node": ">=8"
   },
   "dependencies": {
     "execa": "^1.0.0",
