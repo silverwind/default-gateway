@@ -16,10 +16,10 @@
     "ip-regex": "^2.1.0"
   },
   "devDependencies": {
-    "eslint": "^5.15.1",
-    "eslint-config-silverwind": "^2.1.0",
-    "updates": "^7.2.0",
-    "ver": "4.0.1"
+    "eslint": "^5.16.0",
+    "eslint-config-silverwind": "^3.0.3",
+    "updates": "^8.1.0",
+    "ver": "5.0.1"
   },
   "files": [
     "index.js",
