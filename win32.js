@@ -47,7 +47,7 @@ const promise = async family => {
 
   let name;
   if (id) {
-    const ifTable = execa.sync("wmic", ifArgs(id), spawnOpts).stdout;
+    const ifTable = await execa.stdout("wmic", ifArgs(id), spawnOpts);
     name = parseIfTable(ifTable);
   }
 
