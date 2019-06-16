@@ -29,7 +29,7 @@ function parseIfTable(ifTable) {
   // https://github.com/silverwind/default-gateway/issues/14
   for (const [osname, addrs] of Object.entries(os.networkInterfaces())) {
     for (const addr of addrs) {
-      if (addr && addr.mac === mac) {
+      if (addr && addr.mac && addr.mac.toLowerCase() === mac) {
         return osname;
       }
     }
