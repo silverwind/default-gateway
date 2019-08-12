@@ -4,7 +4,7 @@ const execa = require("execa");
 const ipRegex = require("ip-regex");
 const os = require("os");
 
-const gwArgs = "path Win32_NetworkAdapterConfiguration where IPEnabled=true get DefaultIPGateway,Index /format:table".split(" ");
+const gwArgs = "path Win32_NetworkAdapterConfiguration where IPEnabled=true get DefaultIPGateway,GatewayCostMetric,Index /format:table".split(" ");
 const ifArgs = index => `path Win32_NetworkAdapter where Index=${index} get NetConnectionID,MACAddress /format:table`.split(" ");
 
 const spawnOpts = {
@@ -12,11 +12,15 @@ const spawnOpts = {
 };
 
 function parseGwTable(gwTable, family) {
+  let [bestGw, bestMetric, bestId] = [null, null, null];
   for (const line of (gwTable || "").trim().split("\n").splice(1)) {
-    const [gw, id] = line.trim().split(/} +/) || [];
+    const [gw, metric, id] = line.trim().replace(/{/g, "").replace(/}/g, "").trim().split(/\s+/) || [];
     const gateway = (ipRegex[family]().exec((gw || "").trim()) || [])[0];
-    if (gateway) return [gateway, id];
+    if ((gateway && bestGw === null) || (gateway && bestGw !== null && (parseInt(metric) < parseInt(bestMetric)))) {
+      [bestGw, bestMetric, bestId] = [gateway, metric, id];
+    }
   }
+  if (bestGw) return [bestGw, bestId];
 }
 
 function parseIfTable(ifTable) {
