@@ -41,7 +41,7 @@ const parse = (stdout, family) => {
 };
 
 const promise = async family => {
-  const {stdout} = await execa("netstat", args[family]);
+  const {stdout} = await execa("ip", args[family]);
   return parse(stdout, family);
 };
 
