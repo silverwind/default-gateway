@@ -10,7 +10,7 @@ publish:
 	npm publish
 
 update:
-	npx updates -u -e ip-regex
+	npx updates -u
 	rm -rf node_modules
 	npm i
 

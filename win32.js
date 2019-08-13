@@ -1,25 +1,43 @@
 "use strict";
 
 const execa = require("execa");
-const ipRegex = require("ip-regex");
 const os = require("os");
+const net = require("net");
 
-const gwArgs = "path Win32_NetworkAdapterConfiguration where IPEnabled=true get DefaultIPGateway,GatewayCostMetric,Index /format:table".split(" ");
+const gwArgs = "path Win32_NetworkAdapterConfiguration where IPEnabled=true get DefaultIPGateway,GatewayCostMetric,IPConnectionMetric,Index /format:table".split(" ");
 const ifArgs = index => `path Win32_NetworkAdapter where Index=${index} get NetConnectionID,MACAddress /format:table`.split(" ");
 
 const spawnOpts = {
   windowsHide: true,
 };
 
+// Parsing tables like this. The final metric is GatewayCostMetric + IPConnectionMetric
+//
+// DefaultIPGateway             GatewayCostMetric  Index  IPConnectionMetric
+// {"1.2.3.4", "2001:db8::1"}   {0, 256}           12     25
+// {"2.3.4.5"}                  {25}               12     55
 function parseGwTable(gwTable, family) {
   let [bestGw, bestMetric, bestId] = [null, null, null];
-  for (const line of (gwTable || "").trim().split("\n").splice(1)) {
-    const [gw, metric, id] = line.trim().replace(/{/g, "").replace(/}/g, "").trim().split(/\s+/) || [];
-    const gateway = (ipRegex[family]().exec((gw || "").trim()) || [])[0];
-    if ((gateway && bestGw === null) || (gateway && bestGw !== null && (parseInt(metric) < parseInt(bestMetric)))) {
-      [bestGw, bestMetric, bestId] = [gateway, metric, id];
+
+  for (let line of (gwTable || "").trim().split(/\r?\n/).splice(1)) {
+    line = line.trim();
+    const [_, gwArr, gwCostsArr, id, ipMetric] = /({.+?}) +?({.+?}) +?([0-9]+) +?([0-9]+)/g.exec(line) || [];
+    if (!gwArr) continue;
+
+    const gateways = (gwArr.match(/"(.+?)"/g) || []).map(match => match.substring(1, match.length - 1));
+    const gatewayCosts = (gwCostsArr.match(/[0-9]+/g) || []);
+
+    for (const [index, gateway] of Object.entries(gateways)) {
+      if (!gateway) return;
+      if (`v${net.isIP(gateway)}` !== family) continue;
+
+      const metric = parseInt(gatewayCosts[index]) + parseInt(ipMetric);
+      if (!bestGw || metric < bestMetric) {
+        [bestGw, bestMetric, bestId] = [gateway, metric, id];
+      }
     }
   }
+
   if (bestGw) return [bestGw, bestId];
 }
 
