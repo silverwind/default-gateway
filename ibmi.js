@@ -19,8 +19,9 @@ const parse = stdout => {
   return result;
 };
 
-const promise = family => {
-  return execa.stdout(db2util, [sql, "-p", family, "-o", "json"]).then(stdout => parse(stdout));
+const promise = async family => {
+  const {stdout} = await execa(db2util, [sql, "-p", family, "-o", "json"]);
+  return parse(stdout);
 };
 
 const sync = family => {

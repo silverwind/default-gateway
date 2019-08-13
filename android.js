@@ -26,15 +26,14 @@ const parse = stdout => {
   return result;
 };
 
-const promise = family => {
-  return execa.stdout("ip", args[family]).then(stdout => {
-    return parse(stdout);
-  });
+const promise = async family => {
+  const {stdout} = await execa("ip", args[family]);
+  return parse(stdout, family);
 };
 
 const sync = family => {
-  const result = execa.sync("ip", args[family]);
-  return parse(result.stdout);
+  const {stdout} = execa.sync("ip", args[family]);
+  return parse(stdout);
 };
 
 module.exports.v4 = () => promise("v4");

@@ -59,8 +59,8 @@ function parseIfTable(ifTable) {
 }
 
 const promise = async family => {
-  const gwTable = await execa.stdout("wmic", gwArgs, spawnOpts);
-  const [gateway, id] = parseGwTable(gwTable, family) || [];
+  const {stdout} = await execa("wmic", gwArgs, spawnOpts);
+  const [gateway, id] = parseGwTable(stdout, family) || [];
 
   if (!gateway) {
     throw new Error("Unable to determine default gateway");
@@ -68,16 +68,16 @@ const promise = async family => {
 
   let name;
   if (id) {
-    const ifTable = await execa.stdout("wmic", ifArgs(id), spawnOpts);
-    name = parseIfTable(ifTable);
+    const {stdout} = await execa("wmic", ifArgs(id), spawnOpts);
+    name = parseIfTable(stdout);
   }
 
   return {gateway, interface: name ? name : null};
 };
 
 const sync = family => {
-  const gwTable = execa.sync("wmic", gwArgs, spawnOpts).stdout;
-  const [gateway, id] = parseGwTable(gwTable, family) || [];
+  const {stdout} = execa.sync("wmic", gwArgs, spawnOpts);
+  const [gateway, id] = parseGwTable(stdout, family) || [];
 
   if (!gateway) {
     throw new Error("Unable to determine default gateway");
@@ -85,8 +85,8 @@ const sync = family => {
 
   let name;
   if (id) {
-    const ifTable = execa.sync("wmic", ifArgs(id), spawnOpts).stdout;
-    name = parseIfTable(ifTable);
+    const {stdout} = execa.sync("wmic", ifArgs(id), spawnOpts);
+    name = parseIfTable(stdout);
   }
 
   return {gateway, interface: name ? name : null};

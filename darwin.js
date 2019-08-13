@@ -30,15 +30,14 @@ const parse = (stdout, family) => {
   return result;
 };
 
-const promise = family => {
-  return execa.stdout("netstat", args[family]).then(stdout => {
-    return parse(stdout, family);
-  });
+const promise = async family => {
+  const {stdout} = await execa("netstat", args[family]);
+  return parse(stdout, family);
 };
 
 const sync = family => {
-  const result = execa.sync("netstat", args[family]);
-  return parse(result.stdout, family);
+  const {stdout} = execa.sync("netstat", args[family]);
+  return parse(stdout, family);
 };
 
 module.exports.v4 = () => promise("v4");
