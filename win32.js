@@ -28,8 +28,7 @@ function parseGwTable(gwTable, family) {
     const gatewayCosts = (gwCostsArr.match(/[0-9]+/g) || []);
 
     for (const [index, gateway] of Object.entries(gateways)) {
-      if (!gateway) return;
-      if (`v${net.isIP(gateway)}` !== family) continue;
+      if (!gateway || `v${net.isIP(gateway)}` !== family) continue;
 
       const metric = parseInt(gatewayCosts[index]) + parseInt(ipMetric);
       if (!bestGw || metric < bestMetric) {
