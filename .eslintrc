@@ -1,6 +1,2 @@
 root: true
-extends: eslint-config-silverwind
-
-# workaround for window travis
-rules:
-  linebreak-style: [0]
+extends: silverwind
