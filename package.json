@@ -15,9 +15,9 @@
     "execa": "^2.0.3"
   },
   "devDependencies": {
-    "eslint": "^6.1.0",
-    "eslint-config-silverwind": "^4.0.3",
-    "updates": "^8.5.1",
+    "eslint": "6.1.0",
+    "eslint-config-silverwind": "4.0.3",
+    "updates": "8.5.1",
     "ver": "5.1.2"
   },
   "files": [
