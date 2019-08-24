@@ -12,13 +12,13 @@
     "node": ">=8"
   },
   "dependencies": {
-    "execa": "^2.0.3"
+    "execa": "^2.0.4"
   },
   "devDependencies": {
-    "eslint": "6.1.0",
-    "eslint-config-silverwind": "4.0.3",
-    "updates": "8.5.1",
-    "ver": "5.1.2"
+    "eslint": "6.2.2",
+    "eslint-config-silverwind": "4.0.4",
+    "updates": "8.5.3",
+    "ver": "5.1.3"
   },
   "files": [
     "index.js",
