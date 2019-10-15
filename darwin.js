@@ -1,6 +1,7 @@
 "use strict";
 
 const net = require("net");
+const os = require("os");
 const execa = require("execa");
 const dests = ["default", "0.0.0.0", "0.0.0.0/0", "::", "::/0"];
 
@@ -9,6 +10,10 @@ const args = {
   v6: ["-rn", "-f", "inet6"],
 };
 
+// The IPv4 gateway is in column 3 in Darwin 19 (macOS 10.15 Catalina) and higher,
+// previously it was in column 5
+const v4IfaceColumn = parseInt(os.release()) >= 19 ? 3 : 5;
+
 const parse = (stdout, family) => {
   let result;
 
@@ -16,7 +21,7 @@ const parse = (stdout, family) => {
     const results = line.split(/ +/) || [];
     const target = results[0];
     const gateway = results[1];
-    const iface = results[family === "v4" ? 5 : 3];
+    const iface = results[family === "v4" ? v4IfaceColumn : 3];
     if (dests.includes(target) && gateway && net.isIP(gateway)) {
       result = {gateway, interface: (iface ? iface : null)};
       return true;
