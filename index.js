@@ -18,7 +18,7 @@ if (["aix", "android", "darwin", "freebsd", "linux", "openbsd", "sunos", "win32"
   module.exports.v4.sync = () => m.v4.sync();
   module.exports.v6.sync = () => m.v6.sync();
 } else {
-  const unsupported = () => { throw new Error(`Unsupported Platform: ${platform}`); };
+  const unsupported = () => {throw new Error(`Unsupported Platform: ${platform}`)};
   module.exports.v4 = unsupported;
   module.exports.v6 = unsupported;
   module.exports.v4.sync = unsupported;
