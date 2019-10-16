@@ -16,19 +16,17 @@ $ npm install default-gateway
 ```js
 const defaultGateway = require('default-gateway');
 
-defaultGateway.v4().then(result => {
-  // result = {gateway: '1.2.3.4', interface: 'en1'}
-});
+const {gateway, interface} = await defaultGateway.v4();
+// gateway = '1.2.3.4', interface = 'en1'
 
-defaultGateway.v6().then(result => {
-  // result = {gateway: '2001:db8::1', interface: 'en2'}
-});
+const {gateway, interface} = await defaultGateway.v6();
+// gateway = '2001:db8::1', interface = 'en2'
 
-const result = defaultGateway.v4.sync();
-// result = {gateway: '1.2.3.4', interface: 'en1'}
+const {gateway, interface} = defaultGateway.v4.sync();
+// gateway = '1.2.3.4', interface = 'en1'
 
-const result = defaultGateway.v6.sync();
-// result = {gateway: '2001:db8::1', interface: 'en2'}
+const {gateway, interface} = defaultGateway.v6.sync();
+// gateway = '2001:db8::1', interface = 'en2'
 ```
 
 ## API
