@@ -1,16 +1,16 @@
 "use strict";
 
-const {platform: platformFn, type} = require("os");
+const {platform, type} = require("os");
 
-const platform = platformFn();
+const plat = platform();
 
-if (["aix", "android", "darwin", "freebsd", "linux", "openbsd", "sunos", "win32"].includes(platform)) {
+if (["aix", "android", "darwin", "freebsd", "linux", "openbsd", "sunos", "win32"].includes(plat)) {
   let file;
-  if (platform === "aix") {
+  if (plat === "aix") {
     // AIX `netstat` output is compatible with Solaris
     file = `${type() === "OS400" ? "ibmi" : "sunos"}.js`;
   } else {
-    file = `${platform}.js`;
+    file = `${plat}.js`;
   }
 
   const m = require(`./${file}`);
@@ -19,7 +19,7 @@ if (["aix", "android", "darwin", "freebsd", "linux", "openbsd", "sunos", "win32"
   module.exports.v4.sync = () => m.v4.sync();
   module.exports.v6.sync = () => m.v6.sync();
 } else {
-  const unsupported = () => {throw new Error(`Unsupported Platform: ${platform}`)};
+  const unsupported = () => {throw new Error(`Unsupported Platform: ${plat}`)};
   module.exports.v4 = unsupported;
   module.exports.v6 = unsupported;
   module.exports.v4.sync = unsupported;
