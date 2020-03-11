@@ -12,16 +12,6 @@
   "engines": {
     "node": ">= 10"
   },
-  "dependencies": {
-    "execa": "^4.0.0"
-  },
-  "devDependencies": {
-    "eslint": "6.8.0",
-    "eslint-config-silverwind": "10.0.1",
-    "jest": "25.1.0",
-    "updates": "10.2.2",
-    "versions": "8.2.4"
-  },
   "files": [
     "index.js",
     "android.js",
@@ -33,6 +23,16 @@
     "win32.js",
     "ibmi.js"
   ],
+  "dependencies": {
+    "execa": "^4.0.0"
+  },
+  "devDependencies": {
+    "eslint": "6.8.0",
+    "eslint-config-silverwind": "10.0.1",
+    "jest": "25.1.0",
+    "updates": "10.2.2",
+    "versions": "8.2.4"
+  },
   "keywords": [
     "default gateway",
     "network",
