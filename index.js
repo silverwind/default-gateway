@@ -1,13 +1,14 @@
 "use strict";
 
-const os = require("os");
-const platform = os.platform();
+const {platform: platformFn, type} = require("os");
+
+const platform = platformFn();
 
 if (["aix", "android", "darwin", "freebsd", "linux", "openbsd", "sunos", "win32"].includes(platform)) {
   let file;
   if (platform === "aix") {
     // AIX `netstat` output is compatible with Solaris
-    file = `${os.type() === "OS400" ? "ibmi" : "sunos"}.js`;
+    file = `${type() === "OS400" ? "ibmi" : "sunos"}.js`;
   } else {
     file = `${platform}.js`;
   }

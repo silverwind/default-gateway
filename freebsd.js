@@ -1,6 +1,6 @@
 "use strict";
 
-const net = require("net");
+const {isIP} = require("net");
 const execa = require("execa");
 const dests = ["default", "0.0.0.0", "0.0.0.0/0", "::", "::/0"];
 
@@ -14,7 +14,7 @@ const parse = stdout => {
 
   (stdout || "").trim().split("\n").some(line => {
     const [target, gateway, _, iface] = line.split(/ +/) || [];
-    if (dests.includes(target) && gateway && net.isIP(gateway)) {
+    if (dests.includes(target) && gateway && isIP(gateway)) {
       result = {gateway, interface: (iface ? iface : null)};
       return true;
     }

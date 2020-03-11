@@ -1,8 +1,8 @@
 "use strict";
 
+const {isIP} = require("net");
+const {networkInterfaces} = require("os");
 const execa = require("execa");
-const os = require("os");
-const net = require("net");
 
 const gwArgs = "path Win32_NetworkAdapterConfiguration where IPEnabled=true get DefaultIPGateway,GatewayCostMetric,IPConnectionMetric,Index /format:table".split(" ");
 const ifArgs = index => `path Win32_NetworkAdapter where Index=${index} get NetConnectionID,MACAddress /format:table`.split(" ");
@@ -28,7 +28,7 @@ function parseGwTable(gwTable, family) {
     const gatewayCosts = (gwCostsArr.match(/[0-9]+/g) || []);
 
     for (const [index, gateway] of Object.entries(gateways)) {
-      if (!gateway || `v${net.isIP(gateway)}` !== family) continue;
+      if (!gateway || `v${isIP(gateway)}` !== family) continue;
 
       const metric = parseInt(gatewayCosts[index]) + parseInt(ipMetric);
       if (!bestGw || metric < bestMetric) {
@@ -48,7 +48,7 @@ function parseIfTable(ifTable) {
 
   // try to get the interface name by matching the mac to os.networkInterfaces to avoid wmic's encoding issues
   // https://github.com/silverwind/default-gateway/issues/14
-  for (const [osname, addrs] of Object.entries(os.networkInterfaces())) {
+  for (const [osname, addrs] of Object.entries(networkInterfaces())) {
     for (const addr of addrs) {
       if (addr && addr.mac && addr.mac.toLowerCase() === mac) {
         return osname;
