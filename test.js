@@ -10,11 +10,13 @@ test("v4 async", async () => {
   expect(typeof result.interface).toBe("string");
 });
 
-test("v6 async", async () => {
-  const result = await v6();
-  expect(isIPv6(result.gateway)).toBe(true);
-  expect(typeof result.interface).toBe("string");
-});
+if (!("CI" in process.env)) {
+  test("v6 async", async () => {
+    const result = await v6();
+    expect(isIPv6(result.gateway)).toBe(true);
+    expect(typeof result.interface).toBe("string");
+  });
+}
 
 test("v4 sync", () => {
   const result = v4.sync();
@@ -22,8 +24,10 @@ test("v4 sync", () => {
   expect(typeof result.interface).toBe("string");
 });
 
-test("v6 sync", () => {
-  const result = v6.sync();
-  expect(isIPv6(result.gateway)).toBe(true);
-  expect(typeof result.interface).toBe("string");
-});
+if (!("CI" in process.env)) {
+  test("v6 sync", () => {
+    const result = v6.sync();
+    expect(isIPv6(result.gateway)).toBe(true);
+    expect(typeof result.interface).toBe("string");
+  });
+}
