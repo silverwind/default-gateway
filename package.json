@@ -17,6 +17,7 @@
   "devDependencies": {
     "eslint": "6.6.0",
     "eslint-config-silverwind": "5.0.0",
+    "jest": "25.1.0",
     "updates": "9.0.1",
     "ver": "6.0.2"
   },
