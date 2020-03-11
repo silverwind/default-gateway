@@ -7,7 +7,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [macOS-latest, ubuntu-latest, windows-latest]
-        node: ['10', '12', '13']
+        node: ["10", "12", "13"]
 
     runs-on: ${{ matrix.os }}
     steps:
@@ -17,4 +17,6 @@ jobs:
           node-version: ${{ matrix.node }}
       - run: yarn -s
       - run: yarn -s test
+        env:
+          CI: "true"
 
