@@ -1,5 +1,5 @@
 test:
-	npx eslint --color --quiet *.js
+	yarn -s run eslint --color --quiet *.js
 	node --pending-deprecation --trace-deprecation --throw-deprecation --trace-warnings test.js
 
 publish:
@@ -8,25 +8,22 @@ publish:
 
 deps:
 	rm -rf node_modules
-	npm i
+	yarn
 
 update:
-	npx updates -cu
+	yarn -s run updates -cu
 	$(MAKE) deps
 
-patch:
-	$(MAKE) test
-	npx ver -C patch
+patch: test
+	yarn -s run ver -C patch
 	$(MAKE) publish
 
-minor:
-	$(MAKE) test
-	npx ver -C minor
+minor: test
+	yarn -s run ver -C minor
 	$(MAKE) publish
 
-major:
-	$(MAKE) test
-	npx ver -C major
+major: test
+	yarn -s run ver -C major
 	$(MAKE) publish
 
 .PHONY: test publish deps update patch minor major
