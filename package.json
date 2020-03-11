@@ -1,6 +1,6 @@
 {
   "name": "default-gateway",
-  "version": "5.0.5",
+  "version": "6.0.0",
   "description": "Get the default network gateway, cross-platform.",
   "author": "silverwind <me@silverwind.io>",
   "repository": "silverwind/default-gateway",
