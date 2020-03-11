@@ -15,15 +15,15 @@ update:
 	$(MAKE) deps
 
 patch: test
-	yarn -s run ver -C patch
+	yarn -s run versions -C patch
 	$(MAKE) publish
 
 minor: test
-	yarn -s run ver -C minor
+	yarn -s run versions -C minor
 	$(MAKE) publish
 
 major: test
-	yarn -s run ver -C major
+	yarn -s run versions -C major
 	$(MAKE) publish
 
 .PHONY: test publish deps update patch minor major
