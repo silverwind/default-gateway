@@ -1,12 +1,13 @@
 "use strict";
 
 const {v4, v6} = require(".");
+const {env} = require("process");
 const {isIPv4, isIPv6} = require("net");
 const {platform} = require("os");
 const {test, expect} = global;
 
 // only Darwin has IPv6 on GitHub Actions
-const canTestV6 = process.env.CI && platform() === "darwin";
+const canTestV6 = env.CI ? platform() === "darwin" : true;
 
 test("v4 async", async () => {
   const result = await v4();
