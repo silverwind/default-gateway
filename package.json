@@ -24,14 +24,14 @@
     "ibmi.js"
   ],
   "dependencies": {
-    "execa": "^4.0.1"
+    "execa": "^4.0.2"
   },
   "devDependencies": {
-    "eslint": "7.0.0",
-    "eslint-config-silverwind": "12.0.0",
+    "eslint": "7.1.0",
+    "eslint-config-silverwind": "13.4.2",
     "jest": "26.0.1",
-    "updates": "10.2.10",
-    "versions": "8.2.7"
+    "updates": "10.2.12",
+    "versions": "8.2.10"
   },
   "keywords": [
     "default gateway",
