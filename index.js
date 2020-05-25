@@ -2,9 +2,20 @@
 
 const {platform, type} = require("os");
 
+const supportedPlatforms = new Set([
+  "aix",
+  "android",
+  "darwin",
+  "freebsd",
+  "linux",
+  "openbsd",
+  "sunos",
+  "win32"
+]);
+
 const plat = platform();
 
-if (["aix", "android", "darwin", "freebsd", "linux", "openbsd", "sunos", "win32"].includes(plat)) {
+if (supportedPlatforms.has(plat)) {
   let file;
   if (plat === "aix") {
     // AIX `netstat` output is compatible with Solaris
