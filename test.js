@@ -15,25 +15,25 @@ test("v4 async", async () => {
   expect(typeof result.interface).toBe("string");
 });
 
-test("v6 async", async () => {
-  if (!canTestV6) return;
-  const result = await v6();
-  expect(isIPv6(result.gateway)).toBe(true);
-  expect(typeof result.interface).toBe("string");
-});
-
 test("v4 sync", () => {
   const result = v4.sync();
   expect(isIPv4(result.gateway)).toBe(true);
   expect(typeof result.interface).toBe("string");
 });
 
-test("v6 sync", () => {
-  if (!canTestV6) return;
-  const result = v6.sync();
-  expect(isIPv6(result.gateway)).toBe(true);
-  expect(typeof result.interface).toBe("string");
-});
+if (canTestV6) {
+  test("v6 async", async () => {
+    const result = await v6();
+    expect(isIPv6(result.gateway)).toBe(true);
+    expect(typeof result.interface).toBe("string");
+  });
+
+  test("v6 sync", () => {
+    const result = v6.sync();
+    expect(isIPv6(result.gateway)).toBe(true);
+    expect(typeof result.interface).toBe("string");
+  });
+}
 
 test("unsupported", async () => {
   const mock = jest.spyOn(os, "platform");
