@@ -1,8 +1,6 @@
 # default-gateway
 [![](https://img.shields.io/npm/v/default-gateway.svg?style=flat)](https://www.npmjs.org/package/default-gateway) [![](https://img.shields.io/npm/dm/default-gateway.svg)](https://www.npmjs.org/package/default-gateway)
 
-> Get the default network gateway, cross-platform.
-
 Obtains the machine's default gateway through `exec` calls to OS routing interfaces.
 
 - On Linux and Android, the `ip` command must be available (usually provided by the `iproute2` package).
@@ -13,7 +11,7 @@ Obtains the machine's default gateway through `exec` calls to OS routing interfa
 ## Installation
 
 ```
-$ npm install default-gateway
+$ npm i default-gateway
 ```
 
 ## Example

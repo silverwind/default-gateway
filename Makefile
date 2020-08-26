@@ -2,6 +2,9 @@ test:
 	yarn -s run eslint --color .
 	yarn -s run jest --color
 
+unittest:
+	yarn -s run jest --color --watchAll
+
 publish:
 	git push -u --tags origin master
 	npm publish
@@ -26,4 +29,4 @@ major: test
 	yarn -s run versions -C major
 	$(MAKE) publish
 
-.PHONY: test publish deps update patch minor major
+.PHONY: test unittest publish deps update patch minor major
