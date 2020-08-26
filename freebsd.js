@@ -2,7 +2,7 @@
 
 const {isIP} = require("net");
 const execa = require("execa");
-const dests = ["default", "0.0.0.0", "0.0.0.0/0", "::", "::/0"];
+const dests = new Set(["default", "0.0.0.0", "0.0.0.0/0", "::", "::/0"]);
 
 const args = {
   v4: ["-rn", "-f", "inet"],
@@ -14,7 +14,7 @@ const parse = stdout => {
 
   (stdout || "").trim().split("\n").some(line => {
     const [target, gateway, _, iface] = line.split(/ +/) || [];
-    if (dests.includes(target) && gateway && isIP(gateway)) {
+    if (dests.has(target) && gateway && isIP(gateway)) {
       result = {gateway, interface: (iface ? iface : null)};
       return true;
     }

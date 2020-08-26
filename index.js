@@ -16,15 +16,12 @@ const supportedPlatforms = new Set([
 const plat = platform();
 
 if (supportedPlatforms.has(plat)) {
-  let file;
+  let file = plat;
   if (plat === "aix") {
-    // AIX `netstat` output is compatible with Solaris
-    file = `${type() === "OS400" ? "ibmi" : "sunos"}.js`;
-  } else {
-    file = `${plat}.js`;
+    file = type() === "OS400" ? "ibmi" : "sunos"; // AIX `netstat` output is compatible with Solaris
   }
 
-  const m = require(`./${file}`);
+  const m = require(`./${file}.js`);
   module.exports.v4 = () => m.v4();
   module.exports.v6 = () => m.v6();
   module.exports.v4.sync = () => m.v4.sync();
@@ -33,6 +30,6 @@ if (supportedPlatforms.has(plat)) {
   const err = new Error(`Unsupported Platform: ${plat}`);
   module.exports.v4 = () => Promise.reject(err);
   module.exports.v6 = () => Promise.reject(err);
-  module.exports.v4.sync = () => {throw err; };
-  module.exports.v6.sync = () => {throw err; };
+  module.exports.v4.sync = () => { throw err; };
+  module.exports.v6.sync = () => { throw err; };
 }
