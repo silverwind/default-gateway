@@ -21,7 +21,7 @@
     "ibmi.js"
   ],
   "dependencies": {
-    "execa": "^4.0.3"
+    "execa": "^5.0.0"
   },
   "devDependencies": {
     "eslint": "7.12.1",
