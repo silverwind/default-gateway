@@ -8,7 +8,7 @@ const gwArgs = "path Win32_NetworkAdapterConfiguration where IPEnabled=true get 
 const ifArgs = index => `path Win32_NetworkAdapter where Index=${index} get NetConnectionID,MACAddress /format:table`.split(" ");
 
 const gwArgsPowershell = `-ExecutionPolicy Bypass -Command Get-CimInstance Win32_NetworkAdapterConfiguration -filter IPEnabled=true | Format-Table -property DefaultIPGateway,GatewayCostMetric,Index,IPConnectionMetric`.split(" ");
-const ifArgsPowershell = index => `-ExecutionPolicy Bypass -Command Get-CimInstance Win32_NetworkAdapter -filter Index=${index} | Format-Table -property NetConnectionID,MacAddress`.split(" ");
+const ifArgsPowershell = index => `-ExecutionPolicy Bypass -Command Get-CimInstance Win32_NetworkAdapter -filter Index=${index} | Format-Table -property MacAddress,NetConnectionID`.split(" ");
 
 const spawnOpts = {
   windowsHide: true,
@@ -48,8 +48,8 @@ function parseGwTable(gwTable, family, command) {
   if (bestGw) return [bestGw, bestId];
 }
 
-function parseIfTable(ifTable) {
-  const line = (ifTable || "").trim().split("\n")[1];
+function parseIfTable(ifTable, command) {
+  const line = (ifTable || "").trim().split("\n")[command === "powershell" ? 2 : 1];
 
   let [mac, name] = line.trim().split(/\s+/);
   mac = mac.toLowerCase();
@@ -116,8 +116,8 @@ const promise = async family => {
 
   let name;
   if (id) {
-    const {stdout} = await execCommandWithId(id);
-    name = parseIfTable(stdout);
+    const {stdout, command} = await execCommandWithId(id);
+    name = parseIfTable(stdout, command);
   }
 
   return {gateway, interface: name ? name : null};
@@ -133,8 +133,8 @@ const sync = family => {
 
   let name;
   if (id) {
-    const {stdout} = execCommandWithIdSync(id);
-    name = parseIfTable(stdout);
+    const {stdout, command} = execCommandWithIdSync(id);
+    name = parseIfTable(stdout, command);
   }
 
   return {gateway, interface: name ? name : null};
