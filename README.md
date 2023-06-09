@@ -8,41 +8,33 @@ Obtains the machine's default gateway through `exec` calls to OS routing interfa
 - On IBM i, the `db2util` command must be available (provided by the `db2util` package).
 - On Unix (and macOS), the `netstat` command must be available.
 
-## Installation
-
-```
-$ npm i default-gateway
-```
-
-## Example
+## Usage
 
 ```js
-const defaultGateway = require('default-gateway');
+import {gateway4async, gateway4sync, gateway6async, gateway6sync} from "default-gateway";
 
-const {gateway, interface} = await defaultGateway.v4();
+const {gateway, interface} = await gateway4async();
 // gateway = '1.2.3.4', interface = 'en1'
 
-const {gateway, interface} = await defaultGateway.v6();
+const {gateway, interface} = await gateway6async();
 // gateway = '2001:db8::1', interface = 'en2'
 
-const {gateway, interface} = defaultGateway.v4.sync();
+const {gateway, interface} = gateway4sync();
 // gateway = '1.2.3.4', interface = 'en1'
 
-const {gateway, interface} = defaultGateway.v6.sync();
+const {gateway, interface} = gateway6sync();
 // gateway = '2001:db8::1', interface = 'en2'
 ```
 
 ## API
-### defaultGateway.v4()
-### defaultGateway.v6()
-### defaultGateway.v4.sync()
-### defaultGateway.v6.sync()
+### gateway4async()
+### gateway6async()
+### gateway4sync()
+### gateway6sync()
 
 Returns: `result` *Object*
   - `gateway`: The IP address of the default gateway.
   - `interface`: The name of the interface. On Windows, this is the network adapter name.
-
-The `.v{4,6}()` methods return a Promise while the `.v{4,6}.sync()` variants will return the result synchronously.
 
 The `gateway` property will always be defined on success, while `interface` can be `null` if it cannot be determined. All methods reject/throw on unexpected conditions.
 
