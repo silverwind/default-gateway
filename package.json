@@ -6,6 +6,7 @@
   "repository": "silverwind/default-gateway",
   "license": "BSD-2-Clause",
   "type": "module",
+  "sideEffects": false,
   "exports": "./index.js",
   "engines": {
     "node": ">= 16"
