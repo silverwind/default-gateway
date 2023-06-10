@@ -1,5 +1,2 @@
 root: true
 extends: silverwind
-
-rules:
-  no-inner-declarations: [0]

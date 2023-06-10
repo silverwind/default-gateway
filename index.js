@@ -108,7 +108,7 @@ if (plat === "linux") {
   // DefaultIPGateway             GatewayCostMetric  Index  IPConnectionMetric
   // {"1.2.3.4", "2001:db8::1"}   {0, 256}           12     25
   // {"2.3.4.5"}                  {25}               12     55
-  function parseGwTable(gwTable, family) {
+  function parseGwTable(gwTable, family) { // eslint-disable-line no-inner-declarations
     let [bestGw, bestMetric, bestId] = [null, null, null];
 
     for (let line of (gwTable || "").trim().split(/\r?\n/).splice(1)) {
@@ -132,7 +132,7 @@ if (plat === "linux") {
     if (bestGw) return [bestGw, bestId];
   }
 
-  function parseIfTable(ifTable) {
+  function parseIfTable(ifTable) { // eslint-disable-line no-inner-declarations
     const line = (ifTable || "").trim().split("\n")[1];
 
     let [mac, name] = line.trim().split(/\s+/);
