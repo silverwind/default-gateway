@@ -18,13 +18,13 @@ if (plat === "linux") {
       const gateway = (results[1] || "").substring(5);
       const iface = (results[2] || "").substring(5);
       if (gateway && isIP(gateway)) { // default via 1.2.3.4 dev en0
-        return {gateway, interface: (iface ?? null)};
+        return {gateway, int: (iface ?? null)};
       } else if (iface && !gateway) { // default via dev en0
         const interfaces = networkInterfaces();
         const addresses = interfaces[iface];
         for (const addr of addresses || []) {
           if (addr.family.substring(2) === family && isIP(addr.address)) {
-            return {gateway: addr.address, interface: (iface ?? null)};
+            return {gateway: addr.address, int: (iface ?? null)};
           }
         }
       }
@@ -58,7 +58,7 @@ if (plat === "linux") {
       const gateway = results[1];
       const iface = results[family === "v4" ? v4IfaceColumn : 3];
       if (dests.has(target) && gateway && isIP(gateway)) {
-        return {gateway, interface: (iface ?? null)};
+        return {gateway, int: (iface ?? null)};
       }
     }
     throw new Error("Unable to determine default gateway");
@@ -138,7 +138,7 @@ if (plat === "linux") {
       name = parseIfTable(stdout);
     }
 
-    return {gateway, interface: name ?? null};
+    return {gateway, int: name ?? null};
   };
 
   sync = family => {
@@ -152,7 +152,7 @@ if (plat === "linux") {
       name = parseIfTable(stdout);
     }
 
-    return {gateway, interface: name ?? null};
+    return {gateway, int: name ?? null};
   };
 } else if (plat === "android") {
   const args = {
@@ -164,7 +164,7 @@ if (plat === "linux") {
     for (const line of (stdout || "").trim().split("\n")) {
       const [_, gateway, iface] = /default via (.+?) dev (.+?)( |$)/.exec(line) || [];
       if (gateway && isIP(gateway)) {
-        return {gateway, interface: (iface ?? null)};
+        return {gateway, int: (iface ?? null)};
       }
     }
     throw new Error("Unable to determine default gateway");
@@ -189,7 +189,7 @@ if (plat === "linux") {
     for (const line of (stdout || "").trim().split("\n")) {
       const [target, gateway, _, iface] = line.split(/ +/) || [];
       if (dests.has(target) && gateway && isIP(gateway)) {
-        return {gateway, interface: (iface ?? null)};
+        return {gateway, int: (iface ?? null)};
       }
     }
     throw new Error("Unable to determine default gateway");
@@ -245,7 +245,7 @@ if (plat === "linux") {
       const gateway = results[1];
       const iface = results[7];
       if (dests.has(target) && gateway && isIP(gateway)) {
-        return {gateway, interface: (iface ?? null)};
+        return {gateway, int: (iface ?? null)};
       }
     }
     throw new Error("Unable to determine default gateway");
@@ -274,7 +274,7 @@ if (plat === "linux") {
       const gateway = results[1];
       const iface = results[5];
       if (dests.has(target) && gateway && isIP(gateway)) {
-        return {gateway, interface: (iface ?? null)};
+        return {gateway, int: (iface ?? null)};
       }
     }
     throw new Error("Unable to determine default gateway");
