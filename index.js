@@ -299,3 +299,10 @@ export const gateway4async = () => promise("v4");
 export const gateway6async = () => promise("v6");
 export const gateway4sync = () => sync("v4");
 export const gateway6sync = () => sync("v6");
+
+export default {
+  gateway4async,
+  gateway6async,
+  gateway4sync,
+  gateway6sync,
+};

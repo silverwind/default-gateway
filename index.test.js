@@ -1,10 +1,17 @@
-import {gateway4async, gateway4sync, gateway6async, gateway6sync} from "./index.js";
+import m, {gateway4async, gateway4sync, gateway6async, gateway6sync} from "./index.js";
 import {env} from "node:process";
 import {isIPv4, isIPv6} from "node:net";
 import {platform} from "node:os";
 
 // only Darwin has IPv6 on GitHub Actions
 const canTestV6 = env.CI ? platform() === "darwin" : true;
+
+test("exports", () => {
+  expect(m.gateway4async).toEqual(gateway4async);
+  expect(m.gateway4sync).toEqual(gateway4sync);
+  expect(m.gateway6async).toEqual(gateway6async);
+  expect(m.gateway6sync).toEqual(gateway6sync);
+});
 
 test("gateway4async async", async () => {
   const result = await gateway4async();
