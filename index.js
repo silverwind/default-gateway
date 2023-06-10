@@ -13,7 +13,7 @@ if (plat === "linux") {
       const gateway = (results[1] || "").substring(5);
       const iface = (results[2] || "").substring(5);
       if (gateway && isIP(gateway)) { // default via 1.2.3.4 dev en0
-        return {gateway, int: (iface ?? null)};
+        return {gateway, version: family, int: (iface ?? null)};
       } else if (iface && !gateway) { // default via dev en0
         const interfaces = networkInterfaces();
         const addresses = interfaces[iface];
