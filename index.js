@@ -89,7 +89,8 @@ if (plat === "linux") {
   function parseGwTable(gwTable, family) { // eslint-disable-line no-inner-declarations
     let [bestGw, bestMetric, bestId] = [null, null, null];
 
-    for (const line of (gwTable || "").trim().split(/\r?\n/).splice(1).trim()) {
+    for (let line of (gwTable || "").trim().split(/\r?\n/).splice(1)) {
+      line = line.trim();
       const [_, gwArr, gwCostsArr, id, ipMetric] = /({.+?}) +({.+?}) +([0-9]+) +([0-9]+)/.exec(line) || [];
       if (!gwArr) continue;
 
