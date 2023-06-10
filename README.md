@@ -1,5 +1,5 @@
 # default-gateway
-[![](https://img.shields.io/npm/v/default-gateway.svg?style=flat)](https://www.npmjs.org/package/default-gateway) [![](https://img.shields.io/npm/dm/default-gateway.svg)](https://www.npmjs.org/package/default-gateway)
+[![](https://img.shields.io/npm/v/default-gateway.svg?style=flat)](https://www.npmjs.org/package/default-gateway) [![](https://img.shields.io/npm/dm/default-gateway.svg)](https://www.npmjs.org/package/default-gateway) [![](https://packagephobia.com/badge?p=default-gateway)](https://packagephobia.com/result?p=default-gateway)
 
 Obtains the machine's default gateway through `exec` calls to OS routing ints.
 
