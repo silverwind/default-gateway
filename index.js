@@ -4,159 +4,9 @@ import {platform, type, release, networkInterfaces} from "node:os";
 
 const plat = platform();
 const dests = new Set(["default", "0.0.0.0", "0.0.0.0/0", "::", "::/0"]);
-
-let name;
-if (plat === "aix") {
-  // AIX `netstat` output is compatible with Solaris
-  name = type() === "OS400" ? "ibmi" : "sunos";
-} else {
-  name = plat;
-}
-
 let promise, sync;
 
-if (name === "android") {
-  const args = {
-    v4: ["-4", "r"],
-    v6: ["-6", "r"],
-  };
-
-  const parse = stdout => {
-    let result;
-
-    (stdout || "").trim().split("\n").some(line => {
-      const [_, gateway, iface] = /default via (.+?) dev (.+?)( |$)/.exec(line) || [];
-      if (gateway && isIP(gateway)) {
-        result = {gateway, interface: (iface ?? null)};
-        return true;
-      }
-      return false;
-    });
-
-    if (!result) {
-      throw new Error("Unable to determine default gateway");
-    }
-
-    return result;
-  };
-
-  promise = async family => {
-    const {stdout} = await execa("ip", args[family]);
-    return parse(stdout);
-  };
-
-  sync = family => {
-    const {stdout} = execaSync("ip", args[family]);
-    return parse(stdout);
-  };
-} else if (name === "darwin") {
-  const args = {
-    v4: ["-rn", "-f", "inet"],
-    v6: ["-rn", "-f", "inet6"],
-  };
-
-  // The IPv4 gateway is in column 3 in Darwin 19 (macOS 10.15 Catalina) and higher,
-  // previously it was in column 5
-  const v4IfaceColumn = parseInt(release()) >= 19 ? 3 : 5;
-
-  const parse = (stdout, family) => {
-    let result;
-
-    (stdout || "").trim().split("\n").some(line => {
-      const results = line.split(/ +/) || [];
-      const target = results[0];
-      const gateway = results[1];
-      const iface = results[family === "v4" ? v4IfaceColumn : 3];
-      if (dests.has(target) && gateway && isIP(gateway)) {
-        result = {gateway, interface: (iface ?? null)};
-        return true;
-      }
-      return false;
-    });
-
-    if (!result) {
-      throw new Error("Unable to determine default gateway");
-    }
-
-    return result;
-  };
-
-  promise = async family => {
-    const {stdout} = await execa("netstat", args[family]);
-    return parse(stdout, family);
-  };
-
-  sync = family => {
-    const {stdout} = execaSync("netstat", args[family]);
-    return parse(stdout, family);
-  };
-} else if (name === "freebsd") {
-  const args = {
-    v4: ["-rn", "-f", "inet"],
-    v6: ["-rn", "-f", "inet6"],
-  };
-
-  const parse = stdout => {
-    let result;
-
-    (stdout || "").trim().split("\n").some(line => {
-      const [target, gateway, _, iface] = line.split(/ +/) || [];
-      if (dests.has(target) && gateway && isIP(gateway)) {
-        result = {gateway, interface: (iface ?? null)};
-        return true;
-      }
-      return false;
-    });
-
-    if (!result) {
-      throw new Error("Unable to determine default gateway");
-    }
-
-    return result;
-  };
-
-  promise = async family => {
-    const {stdout} = await execa("netstat", args[family]);
-    return parse(stdout);
-  };
-
-  sync = family => {
-    const {stdout} = execaSync("netstat", args[family]);
-    return parse(stdout);
-  };
-} else if (name === "ibmi") {
-  const args = {
-    v4: "IPV4",
-    v6: "IPV6",
-  };
-
-  const db2util = "/QOpenSys/pkgs/bin/db2util";
-  const sql = "select NEXT_HOP, LOCAL_BINDING_INTERFACE from QSYS2.NETSTAT_ROUTE_INFO where ROUTE_TYPE='DFTROUTE' and NEXT_HOP!='*DIRECT' and CONNECTION_TYPE=?";
-
-  const parse = stdout => {
-    let result;
-    try {
-      const resultObj = JSON.parse(stdout);
-      const gateway = resultObj.records[0].NEXT_HOP;
-      const iface = resultObj.records[0].LOCAL_BINDING_INTERFACE;
-      result = {gateway, iface};
-    } catch {}
-    if (!result) {
-      throw new Error("Unable to determine default gateway");
-    }
-    return result;
-  };
-
-  promise = async family => {
-    const {stdout} = await execa(db2util, [sql, "-p", args[family], "-o", "json"]);
-    return parse(stdout);
-  };
-
-  sync = family => {
-    const {stdout} = execaSync(db2util, [sql, "-p", args[family], "-o", "json"]);
-    return parse(stdout);
-  };
-} else if (name === "linux") {
+if (plat === "linux") {
   const args = {
     v4: ["-4", "r"],
     v6: ["-6", "r"],
@@ -204,20 +54,24 @@ if (name === "android") {
     const {stdout} = execaSync("ip", args[family]);
     return parse(stdout, family);
   };
-} else if (name === "openbsd") {
+} else if (plat === "darwin") {
   const args = {
     v4: ["-rn", "-f", "inet"],
     v6: ["-rn", "-f", "inet6"],
   };
 
-  const parse = stdout => {
+  // The IPv4 gateway is in column 3 in Darwin 19 (macOS 10.15 Catalina) and higher,
+  // previously it was in column 5
+  const v4IfaceColumn = parseInt(release()) >= 19 ? 3 : 5;
+
+  const parse = (stdout, family) => {
     let result;
 
     (stdout || "").trim().split("\n").some(line => {
       const results = line.split(/ +/) || [];
       const target = results[0];
       const gateway = results[1];
-      const iface = results[7];
+      const iface = results[family === "v4" ? v4IfaceColumn : 3];
       if (dests.has(target) && gateway && isIP(gateway)) {
         result = {gateway, interface: (iface ?? null)};
         return true;
@@ -234,51 +88,14 @@ if (name === "android") {
 
   promise = async family => {
     const {stdout} = await execa("netstat", args[family]);
-    return parse(stdout);
+    return parse(stdout, family);
   };
 
   sync = family => {
     const {stdout} = execaSync("netstat", args[family]);
-    return parse(stdout);
+    return parse(stdout, family);
   };
-} else if (name === "sunos") {
-  const args = {
-    v4: ["-rn", "-f", "inet"],
-    v6: ["-rn", "-f", "inet6"],
-  };
-
-  const parse = stdout => {
-    let result;
-
-    (stdout || "").trim().split("\n").some(line => {
-      const results = line.split(/ +/) || [];
-      const target = results[0];
-      const gateway = results[1];
-      const iface = results[5];
-      if (dests.has(target) && gateway && isIP(gateway)) {
-        result = {gateway, interface: (iface ?? null)};
-        return true;
-      }
-      return false;
-    });
-
-    if (!result) {
-      throw new Error("Unable to determine default gateway");
-    }
-
-    return result;
-  };
-
-  promise = async family => {
-    const {stdout} = await execa("netstat", args[family]);
-    return parse(stdout);
-  };
-
-  sync = family => {
-    const {stdout} = execaSync("netstat", args[family]);
-    return parse(stdout);
-  };
-} else if (name === "win32") {
+} else if (plat === "win32") {
   const gwArgs = "path Win32_NetworkAdapterConfiguration where IPEnabled=true get DefaultIPGateway,GatewayCostMetric,IPConnectionMetric,Index /format:table".split(" ");
   const ifArgs = index => `path Win32_NetworkAdapter where Index=${index} get NetConnectionID,MACAddress /format:table`.split(" ");
 
@@ -365,6 +182,181 @@ if (name === "android") {
     }
 
     return {gateway, interface: name ?? null};
+  };
+} else if (plat === "android") {
+  const args = {
+    v4: ["-4", "r"],
+    v6: ["-6", "r"],
+  };
+
+  const parse = stdout => {
+    let result;
+
+    (stdout || "").trim().split("\n").some(line => {
+      const [_, gateway, iface] = /default via (.+?) dev (.+?)( |$)/.exec(line) || [];
+      if (gateway && isIP(gateway)) {
+        result = {gateway, interface: (iface ?? null)};
+        return true;
+      }
+      return false;
+    });
+
+    if (!result) {
+      throw new Error("Unable to determine default gateway");
+    }
+
+    return result;
+  };
+
+  promise = async family => {
+    const {stdout} = await execa("ip", args[family]);
+    return parse(stdout);
+  };
+
+  sync = family => {
+    const {stdout} = execaSync("ip", args[family]);
+    return parse(stdout);
+  };
+} else if (plat === "freebsd") {
+  const args = {
+    v4: ["-rn", "-f", "inet"],
+    v6: ["-rn", "-f", "inet6"],
+  };
+
+  const parse = stdout => {
+    let result;
+
+    (stdout || "").trim().split("\n").some(line => {
+      const [target, gateway, _, iface] = line.split(/ +/) || [];
+      if (dests.has(target) && gateway && isIP(gateway)) {
+        result = {gateway, interface: (iface ?? null)};
+        return true;
+      }
+      return false;
+    });
+
+    if (!result) {
+      throw new Error("Unable to determine default gateway");
+    }
+
+    return result;
+  };
+
+  promise = async family => {
+    const {stdout} = await execa("netstat", args[family]);
+    return parse(stdout);
+  };
+
+  sync = family => {
+    const {stdout} = execaSync("netstat", args[family]);
+    return parse(stdout);
+  };
+} else if (plat === "aix" && type() === "OS400") {
+  const args = {
+    v4: "IPV4",
+    v6: "IPV6",
+  };
+
+  const db2util = "/QOpenSys/pkgs/bin/db2util";
+  const sql = "select NEXT_HOP, LOCAL_BINDING_INTERFACE from QSYS2.NETSTAT_ROUTE_INFO where ROUTE_TYPE='DFTROUTE' and NEXT_HOP!='*DIRECT' and CONNECTION_TYPE=?";
+
+  const parse = stdout => {
+    let result;
+    try {
+      const resultObj = JSON.parse(stdout);
+      const gateway = resultObj.records[0].NEXT_HOP;
+      const iface = resultObj.records[0].LOCAL_BINDING_INTERFACE;
+      result = {gateway, iface};
+    } catch {}
+    if (!result) {
+      throw new Error("Unable to determine default gateway");
+    }
+    return result;
+  };
+
+  promise = async family => {
+    const {stdout} = await execa(db2util, [sql, "-p", args[family], "-o", "json"]);
+    return parse(stdout);
+  };
+
+  sync = family => {
+    const {stdout} = execaSync(db2util, [sql, "-p", args[family], "-o", "json"]);
+    return parse(stdout);
+  };
+} else if (plat === "openbsd") {
+  const args = {
+    v4: ["-rn", "-f", "inet"],
+    v6: ["-rn", "-f", "inet6"],
+  };
+
+  const parse = stdout => {
+    let result;
+
+    (stdout || "").trim().split("\n").some(line => {
+      const results = line.split(/ +/) || [];
+      const target = results[0];
+      const gateway = results[1];
+      const iface = results[7];
+      if (dests.has(target) && gateway && isIP(gateway)) {
+        result = {gateway, interface: (iface ?? null)};
+        return true;
+      }
+      return false;
+    });
+
+    if (!result) {
+      throw new Error("Unable to determine default gateway");
+    }
+
+    return result;
+  };
+
+  promise = async family => {
+    const {stdout} = await execa("netstat", args[family]);
+    return parse(stdout);
+  };
+
+  sync = family => {
+    const {stdout} = execaSync("netstat", args[family]);
+    return parse(stdout);
+  };
+} else if (plat === "sunos" || (plat === "aix" && type() !== "OS400")) {
+  // AIX `netstat` output is compatible with Solaris
+  const args = {
+    v4: ["-rn", "-f", "inet"],
+    v6: ["-rn", "-f", "inet6"],
+  };
+
+  const parse = stdout => {
+    let result;
+
+    (stdout || "").trim().split("\n").some(line => {
+      const results = line.split(/ +/) || [];
+      const target = results[0];
+      const gateway = results[1];
+      const iface = results[5];
+      if (dests.has(target) && gateway && isIP(gateway)) {
+        result = {gateway, interface: (iface ?? null)};
+        return true;
+      }
+      return false;
+    });
+
+    if (!result) {
+      throw new Error("Unable to determine default gateway");
+    }
+
+    return result;
+  };
+
+  promise = async family => {
+    const {stdout} = await execa("netstat", args[family]);
+    return parse(stdout);
+  };
+
+  sync = family => {
+    const {stdout} = execaSync("netstat", args[family]);
+    return parse(stdout);
   };
 } else {
   promise = (_) => { throw new Error("Unsupported Platform"); };
