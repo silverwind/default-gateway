@@ -13,36 +13,23 @@ if (plat === "linux") {
   };
 
   const parse = (stdout, family) => {
-    let result;
-
-    (stdout || "").trim().split("\n").some(line => {
+    for (const line of (stdout || "").trim().split("\n")) {
       const results = /default( via .+?)?( dev .+?)( |$)/.exec(line) || [];
       const gateway = (results[1] || "").substring(5);
       const iface = (results[2] || "").substring(5);
       if (gateway && isIP(gateway)) { // default via 1.2.3.4 dev en0
-        result = {gateway, interface: (iface ?? null)};
-        return true;
+        return {gateway, interface: (iface ?? null)};
       } else if (iface && !gateway) { // default via dev en0
         const interfaces = networkInterfaces();
         const addresses = interfaces[iface];
-        if (!addresses || !addresses.length) return false;
-
-        addresses.some(addr => {
+        for (const addr of addresses || []) {
           if (addr.family.substring(2) === family && isIP(addr.address)) {
-            result = {gateway: addr.address, interface: (iface ?? null)};
-            return true;
+            return {gateway: addr.address, interface: (iface ?? null)};
           }
-          return false;
-        });
+        }
       }
-      return false;
-    });
-
-    if (!result) {
-      throw new Error("Unable to determine default gateway");
     }
-
-    return result;
+    throw new Error("Unable to determine default gateway");
   };
 
   promise = async family => {
@@ -65,25 +52,16 @@ if (plat === "linux") {
   const v4IfaceColumn = parseInt(release()) >= 19 ? 3 : 5;
 
   const parse = (stdout, family) => {
-    let result;
-
-    (stdout || "").trim().split("\n").some(line => {
+    for (const line of (stdout || "").trim().split("\n")) {
       const results = line.split(/ +/) || [];
       const target = results[0];
       const gateway = results[1];
       const iface = results[family === "v4" ? v4IfaceColumn : 3];
       if (dests.has(target) && gateway && isIP(gateway)) {
-        result = {gateway, interface: (iface ?? null)};
-        return true;
+        return {gateway, interface: (iface ?? null)};
       }
-      return false;
-    });
-
-    if (!result) {
-      throw new Error("Unable to determine default gateway");
     }
-
-    return result;
+    throw new Error("Unable to determine default gateway");
   };
 
   promise = async family => {
@@ -111,8 +89,7 @@ if (plat === "linux") {
   function parseGwTable(gwTable, family) { // eslint-disable-line no-inner-declarations
     let [bestGw, bestMetric, bestId] = [null, null, null];
 
-    for (let line of (gwTable || "").trim().split(/\r?\n/).splice(1)) {
-      line = line.trim();
+    for (const line of (gwTable || "").trim().split(/\r?\n/).splice(1).trim()) {
       const [_, gwArr, gwCostsArr, id, ipMetric] = /({.+?}) +({.+?}) +([0-9]+) +([0-9]+)/.exec(line) || [];
       if (!gwArr) continue;
 
@@ -153,10 +130,7 @@ if (plat === "linux") {
   promise = async family => {
     const {stdout} = await execa("wmic", gwArgs, spawnOpts);
     const [gateway, id] = parseGwTable(stdout, family) || [];
-
-    if (!gateway) {
-      throw new Error("Unable to determine default gateway");
-    }
+    if (!gateway) throw new Error("Unable to determine default gateway");
 
     let name;
     if (id) {
@@ -170,10 +144,7 @@ if (plat === "linux") {
   sync = family => {
     const {stdout} = execaSync("wmic", gwArgs, spawnOpts);
     const [gateway, id] = parseGwTable(stdout, family) || [];
-
-    if (!gateway) {
-      throw new Error("Unable to determine default gateway");
-    }
+    if (!gateway) throw new Error("Unable to determine default gateway");
 
     let name;
     if (id) {
@@ -190,22 +161,13 @@ if (plat === "linux") {
   };
 
   const parse = stdout => {
-    let result;
-
-    (stdout || "").trim().split("\n").some(line => {
+    for (const line of (stdout || "").trim().split("\n")) {
       const [_, gateway, iface] = /default via (.+?) dev (.+?)( |$)/.exec(line) || [];
       if (gateway && isIP(gateway)) {
-        result = {gateway, interface: (iface ?? null)};
-        return true;
+        return {gateway, interface: (iface ?? null)};
       }
-      return false;
-    });
-
-    if (!result) {
-      throw new Error("Unable to determine default gateway");
     }
-
-    return result;
+    throw new Error("Unable to determine default gateway");
   };
 
   promise = async family => {
@@ -224,22 +186,13 @@ if (plat === "linux") {
   };
 
   const parse = stdout => {
-    let result;
-
-    (stdout || "").trim().split("\n").some(line => {
+    for (const line of (stdout || "").trim().split("\n")) {
       const [target, gateway, _, iface] = line.split(/ +/) || [];
       if (dests.has(target) && gateway && isIP(gateway)) {
-        result = {gateway, interface: (iface ?? null)};
-        return true;
+        return {gateway, interface: (iface ?? null)};
       }
-      return false;
-    });
-
-    if (!result) {
-      throw new Error("Unable to determine default gateway");
     }
-
-    return result;
+    throw new Error("Unable to determine default gateway");
   };
 
   promise = async family => {
@@ -261,17 +214,13 @@ if (plat === "linux") {
   const sql = "select NEXT_HOP, LOCAL_BINDING_INTERFACE from QSYS2.NETSTAT_ROUTE_INFO where ROUTE_TYPE='DFTROUTE' and NEXT_HOP!='*DIRECT' and CONNECTION_TYPE=?";
 
   const parse = stdout => {
-    let result;
     try {
       const resultObj = JSON.parse(stdout);
       const gateway = resultObj.records[0].NEXT_HOP;
       const iface = resultObj.records[0].LOCAL_BINDING_INTERFACE;
-      result = {gateway, iface};
+      return {gateway, iface};
     } catch {}
-    if (!result) {
-      throw new Error("Unable to determine default gateway");
-    }
-    return result;
+    throw new Error("Unable to determine default gateway");
   };
 
   promise = async family => {
@@ -290,25 +239,16 @@ if (plat === "linux") {
   };
 
   const parse = stdout => {
-    let result;
-
-    (stdout || "").trim().split("\n").some(line => {
+    for (const line of (stdout || "").trim().split("\n")) {
       const results = line.split(/ +/) || [];
       const target = results[0];
       const gateway = results[1];
       const iface = results[7];
       if (dests.has(target) && gateway && isIP(gateway)) {
-        result = {gateway, interface: (iface ?? null)};
-        return true;
+        return {gateway, interface: (iface ?? null)};
       }
-      return false;
-    });
-
-    if (!result) {
-      throw new Error("Unable to determine default gateway");
     }
-
-    return result;
+    throw new Error("Unable to determine default gateway");
   };
 
   promise = async family => {
@@ -328,25 +268,16 @@ if (plat === "linux") {
   };
 
   const parse = stdout => {
-    let result;
-
-    (stdout || "").trim().split("\n").some(line => {
+    for (const line of (stdout || "").trim().split("\n")) {
       const results = line.split(/ +/) || [];
       const target = results[0];
       const gateway = results[1];
       const iface = results[5];
       if (dests.has(target) && gateway && isIP(gateway)) {
-        result = {gateway, interface: (iface ?? null)};
-        return true;
+        return {gateway, interface: (iface ?? null)};
       }
-      return false;
-    });
-
-    if (!result) {
-      throw new Error("Unable to determine default gateway");
     }
-
-    return result;
+    throw new Error("Unable to determine default gateway");
   };
 
   promise = async family => {
