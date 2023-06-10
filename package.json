@@ -11,15 +11,7 @@
     "node": ">= 16"
   },
   "files": [
-    "./index.js",
-    "./android.js",
-    "./darwin.js",
-    "./freebsd.js",
-    "./linux.js",
-    "./openbsd.js",
-    "./sunos.js",
-    "./win32.js",
-    "./ibmi.js"
+    "./index.js"
   ],
   "dependencies": {
     "execa": "^7.1.1"

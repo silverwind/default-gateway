@@ -13,8 +13,7 @@ if (plat === "aix") {
   name = plat;
 }
 
-let promise = (_) => { throw new Error("Unsupported Platform"); };
-let sync = (_) => { throw new Error("Unsupported Platform"); };
+let promise, sync;
 
 if (name === "android") {
   const args = {
@@ -367,6 +366,9 @@ if (name === "android") {
 
     return {gateway, interface: name ?? null};
   };
+} else {
+  promise = (_) => { throw new Error("Unsupported Platform"); };
+  sync = (_) => { throw new Error("Unsupported Platform"); };
 }
 
 export const gateway4async = () => promise("v4");
