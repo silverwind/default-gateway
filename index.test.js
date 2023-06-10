@@ -17,12 +17,14 @@ test("gateway4async async", async () => {
   const result = await gateway4async();
   expect(isIPv4(result.gateway)).toBe(true);
   expect(result.int).toBeTruthy();
+  expect(result.version).toEqual(4);
 });
 
 test("gateway4async sync", () => {
   const result = gateway4sync();
   expect(isIPv4(result.gateway)).toBe(true);
   expect(result.int).toBeTruthy();
+  expect(result.version).toEqual(4);
 });
 
 test("v6 async", async () => {
@@ -30,6 +32,7 @@ test("v6 async", async () => {
   const result = await gateway6async();
   expect(isIPv6(result.gateway)).toBe(true);
   expect(result.int).toBeTruthy();
+  expect(result.version).toEqual(6);
 });
 
 test("v6 sync", () => {
@@ -37,4 +40,5 @@ test("v6 sync", () => {
   const result = gateway6sync();
   expect(isIPv6(result.gateway)).toBe(true);
   expect(result.int).toBeTruthy();
+  expect(result.version).toEqual(6);
 });

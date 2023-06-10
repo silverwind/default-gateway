@@ -19,7 +19,7 @@ if (plat === "linux") {
         const addresses = interfaces[iface];
         for (const addr of addresses || []) {
           if (Number(family.substring(3)) === family && isIP(addr.address)) {
-            return {gateway: addr.address, int: (iface ?? null)};
+            return {gateway: addr.address, version: family, int: (iface ?? null)};
           }
         }
       }
@@ -46,9 +46,9 @@ if (plat === "linux") {
       const results = line.split(/ +/) || [];
       const target = results[0];
       const gateway = results[1];
-      const iface = results[family === "v4" ? v4IfaceColumn : 3];
+      const iface = results[family === 4 ? v4IfaceColumn : 3];
       if (dests.has(target) && gateway && isIP(gateway)) {
-        return {gateway, int: (iface ?? null)};
+        return {gateway, version: family, int: (iface ?? null)};
       }
     }
     throw new Error("Unable to determine default gateway");
@@ -129,7 +129,7 @@ if (plat === "linux") {
       name = parseIfTable(stdout);
     }
 
-    return {gateway, int: name ?? null};
+    return {gateway, version: family, int: name ?? null};
   };
 
   sync = family => {
@@ -143,14 +143,14 @@ if (plat === "linux") {
       name = parseIfTable(stdout);
     }
 
-    return {gateway, int: name ?? null};
+    return {gateway, version: family, int: name ?? null};
   };
 } else if (plat === "android") {
-  const parse = stdout => {
+  const parse = (stdout, family) => {
     for (const line of (stdout || "").trim().split("\n")) {
       const [_, gateway, iface] = /default via (.+?) dev (.+?)( |$)/.exec(line) || [];
       if (gateway && isIP(gateway)) {
-        return {gateway, int: (iface ?? null)};
+        return {gateway, version: family, int: (iface ?? null)};
       }
     }
     throw new Error("Unable to determine default gateway");
@@ -158,19 +158,19 @@ if (plat === "linux") {
 
   promise = async family => {
     const {stdout} = await execa("ip", [`-${family}`, "r"]);
-    return parse(stdout);
+    return parse(stdout, family);
   };
 
   sync = family => {
     const {stdout} = execaSync("ip", [`-${family}`, "r"]);
-    return parse(stdout);
+    return parse(stdout, family);
   };
 } else if (plat === "freebsd") {
-  const parse = stdout => {
+  const parse = (stdout, family) => {
     for (const line of (stdout || "").trim().split("\n")) {
       const [target, gateway, _, iface] = line.split(/ +/) || [];
       if (dests.has(target) && gateway && isIP(gateway)) {
-        return {gateway, int: (iface ?? null)};
+        return {gateway, version: family, int: (iface ?? null)};
       }
     }
     throw new Error("Unable to determine default gateway");
@@ -178,45 +178,45 @@ if (plat === "linux") {
 
   promise = async family => {
     const {stdout} = await execa("netstat", ["-rn", "-f", family === 4 ? "inet" : "inet6"]);
-    return parse(stdout);
+    return parse(stdout, family);
   };
 
   sync = family => {
     const {stdout} = execaSync("netstat", ["-rn", "-f", family === 4 ? "inet" : "inet6"]);
-    return parse(stdout);
+    return parse(stdout, family);
   };
 } else if (plat === "aix" && type() === "OS400") {
   const db2util = "/QOpenSys/pkgs/bin/db2util";
   const sql = "select NEXT_HOP, LOCAL_BINDING_INTERFACE from QSYS2.NETSTAT_ROUTE_INFO where ROUTE_TYPE='DFTROUTE' and NEXT_HOP!='*DIRECT' and CONNECTION_TYPE=?";
 
-  const parse = stdout => {
+  const parse = (stdout, family) => {
     try {
       const resultObj = JSON.parse(stdout);
       const gateway = resultObj.records[0].NEXT_HOP;
       const iface = resultObj.records[0].LOCAL_BINDING_INTERFACE;
-      return {gateway, iface};
+      return {gateway, version: family, iface};
     } catch {}
     throw new Error("Unable to determine default gateway");
   };
 
   promise = async family => {
     const {stdout} = await execa(db2util, [sql, "-p", `IPV${family}`, "-o", "json"]);
-    return parse(stdout);
+    return parse(stdout, family);
   };
 
   sync = family => {
     const {stdout} = execaSync(db2util, [sql, "-p", `IPV${family}`, "-o", "json"]);
-    return parse(stdout);
+    return parse(stdout, family);
   };
 } else if (plat === "openbsd") {
-  const parse = stdout => {
+  const parse = (stdout, family) => {
     for (const line of (stdout || "").trim().split("\n")) {
       const results = line.split(/ +/) || [];
       const target = results[0];
       const gateway = results[1];
       const iface = results[7];
       if (dests.has(target) && gateway && isIP(gateway)) {
-        return {gateway, int: (iface ?? null)};
+        return {gateway, version: family, int: (iface ?? null)};
       }
     }
     throw new Error("Unable to determine default gateway");
@@ -224,22 +224,22 @@ if (plat === "linux") {
 
   promise = async family => {
     const {stdout} = await execa("netstat", ["-rn", "-f", family === 4 ? "inet" : "inet6"]);
-    return parse(stdout);
+    return parse(stdout, family);
   };
 
   sync = family => {
     const {stdout} = execaSync("netstat", ["-rn", "-f", family === 4 ? "inet" : "inet6"]);
-    return parse(stdout);
+    return parse(stdout, family);
   };
 } else if (plat === "sunos" || (plat === "aix" && type() !== "OS400")) { // AIX `netstat` output is compatible with Solaris
-  const parse = stdout => {
+  const parse = (stdout, family) => {
     for (const line of (stdout || "").trim().split("\n")) {
       const results = line.split(/ +/) || [];
       const target = results[0];
       const gateway = results[1];
       const iface = results[5];
       if (dests.has(target) && gateway && isIP(gateway)) {
-        return {gateway, int: (iface ?? null)};
+        return {gateway, version: family, int: (iface ?? null)};
       }
     }
     throw new Error("Unable to determine default gateway");
@@ -247,12 +247,12 @@ if (plat === "linux") {
 
   promise = async family => {
     const {stdout} = await execa("netstat", ["-rn", "-f", family === 4 ? "inet" : "inet6"]);
-    return parse(stdout);
+    return parse(stdout, family);
   };
 
   sync = family => {
     const {stdout} = execaSync("netstat", ["-rn", "-f", family === 4 ? "inet" : "inet6"]);
-    return parse(stdout);
+    return parse(stdout, family);
   };
 } else {
   promise = (_) => { throw new Error("Unsupported Platform"); };
