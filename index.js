@@ -7,11 +7,6 @@ const dests = new Set(["default", "0.0.0.0", "0.0.0.0/0", "::", "::/0"]);
 let promise, sync;
 
 if (plat === "linux") {
-  const args = {
-    v4: ["-4", "r"],
-    v6: ["-6", "r"],
-  };
-
   const parse = (stdout, family) => {
     for (const line of (stdout || "").trim().split("\n")) {
       const results = /default( via .+?)?( dev .+?)( |$)/.exec(line) || [];
@@ -23,7 +18,7 @@ if (plat === "linux") {
         const interfaces = networkInterfaces();
         const addresses = interfaces[iface];
         for (const addr of addresses || []) {
-          if (addr.family.substring(2) === family && isIP(addr.address)) {
+          if (Number(family.substring(3)) === family && isIP(addr.address)) {
             return {gateway: addr.address, int: (iface ?? null)};
           }
         }
@@ -33,20 +28,15 @@ if (plat === "linux") {
   };
 
   promise = async family => {
-    const {stdout} = await execa("ip", args[family]);
+    const {stdout} = await execa("ip", [`-${family}`, "r"]);
     return parse(stdout, family);
   };
 
   sync = family => {
-    const {stdout} = execaSync("ip", args[family]);
+    const {stdout} = execaSync("ip", [`-${family}`, "r"]);
     return parse(stdout, family);
   };
 } else if (plat === "darwin") {
-  const args = {
-    v4: ["-rn", "-f", "inet"],
-    v6: ["-rn", "-f", "inet6"],
-  };
-
   // The IPv4 gateway is in column 3 in Darwin 19 (macOS 10.15 Catalina) and higher,
   // previously it was in column 5
   const v4IfaceColumn = parseInt(release()) >= 19 ? 3 : 5;
@@ -65,12 +55,12 @@ if (plat === "linux") {
   };
 
   promise = async family => {
-    const {stdout} = await execa("netstat", args[family]);
+    const {stdout} = await execa("netstat", ["-rn", "-f", family === 4 ? "inet" : "inet6"]);
     return parse(stdout, family);
   };
 
   sync = family => {
-    const {stdout} = execaSync("netstat", args[family]);
+    const {stdout} = execaSync("netstat", ["-rn", "-f", family === 4 ? "inet" : "inet6"]);
     return parse(stdout, family);
   };
 } else if (plat === "win32") {
@@ -98,7 +88,7 @@ if (plat === "linux") {
       const gatewayCosts = (gwCostsArr.match(/[0-9]+/g) || []);
 
       for (const [index, gateway] of Object.entries(gateways)) {
-        if (!gateway || `v${isIP(gateway)}` !== family) continue;
+        if (!gateway || isIP(gateway) !== family) continue;
 
         const metric = parseInt(gatewayCosts[index]) + parseInt(ipMetric);
         if (!bestGw || metric < bestMetric) {
@@ -120,7 +110,7 @@ if (plat === "linux") {
     // https://github.com/silverwind/default-gateway/issues/14
     for (const [osname, addrs] of Object.entries(networkInterfaces())) {
       for (const addr of addrs) {
-        if (addr && addr.mac && addr.mac.toLowerCase() === mac) {
+        if (addr?.mac?.toLowerCase() === mac) {
           return osname;
         }
       }
@@ -156,11 +146,6 @@ if (plat === "linux") {
     return {gateway, int: name ?? null};
   };
 } else if (plat === "android") {
-  const args = {
-    v4: ["-4", "r"],
-    v6: ["-6", "r"],
-  };
-
   const parse = stdout => {
     for (const line of (stdout || "").trim().split("\n")) {
       const [_, gateway, iface] = /default via (.+?) dev (.+?)( |$)/.exec(line) || [];
@@ -172,20 +157,15 @@ if (plat === "linux") {
   };
 
   promise = async family => {
-    const {stdout} = await execa("ip", args[family]);
+    const {stdout} = await execa("ip", [`-${family}`, "r"]);
     return parse(stdout);
   };
 
   sync = family => {
-    const {stdout} = execaSync("ip", args[family]);
+    const {stdout} = execaSync("ip", [`-${family}`, "r"]);
     return parse(stdout);
   };
 } else if (plat === "freebsd") {
-  const args = {
-    v4: ["-rn", "-f", "inet"],
-    v6: ["-rn", "-f", "inet6"],
-  };
-
   const parse = stdout => {
     for (const line of (stdout || "").trim().split("\n")) {
       const [target, gateway, _, iface] = line.split(/ +/) || [];
@@ -197,20 +177,15 @@ if (plat === "linux") {
   };
 
   promise = async family => {
-    const {stdout} = await execa("netstat", args[family]);
+    const {stdout} = await execa("netstat", ["-rn", "-f", family === 4 ? "inet" : "inet6"]);
     return parse(stdout);
   };
 
   sync = family => {
-    const {stdout} = execaSync("netstat", args[family]);
+    const {stdout} = execaSync("netstat", ["-rn", "-f", family === 4 ? "inet" : "inet6"]);
     return parse(stdout);
   };
 } else if (plat === "aix" && type() === "OS400") {
-  const args = {
-    v4: "IPV4",
-    v6: "IPV6",
-  };
-
   const db2util = "/QOpenSys/pkgs/bin/db2util";
   const sql = "select NEXT_HOP, LOCAL_BINDING_INTERFACE from QSYS2.NETSTAT_ROUTE_INFO where ROUTE_TYPE='DFTROUTE' and NEXT_HOP!='*DIRECT' and CONNECTION_TYPE=?";
 
@@ -225,20 +200,15 @@ if (plat === "linux") {
   };
 
   promise = async family => {
-    const {stdout} = await execa(db2util, [sql, "-p", args[family], "-o", "json"]);
+    const {stdout} = await execa(db2util, [sql, "-p", `IPV${family}`, "-o", "json"]);
     return parse(stdout);
   };
 
   sync = family => {
-    const {stdout} = execaSync(db2util, [sql, "-p", args[family], "-o", "json"]);
+    const {stdout} = execaSync(db2util, [sql, "-p", `IPV${family}`, "-o", "json"]);
     return parse(stdout);
   };
 } else if (plat === "openbsd") {
-  const args = {
-    v4: ["-rn", "-f", "inet"],
-    v6: ["-rn", "-f", "inet6"],
-  };
-
   const parse = stdout => {
     for (const line of (stdout || "").trim().split("\n")) {
       const results = line.split(/ +/) || [];
@@ -253,21 +223,15 @@ if (plat === "linux") {
   };
 
   promise = async family => {
-    const {stdout} = await execa("netstat", args[family]);
+    const {stdout} = await execa("netstat", ["-rn", "-f", family === 4 ? "inet" : "inet6"]);
     return parse(stdout);
   };
 
   sync = family => {
-    const {stdout} = execaSync("netstat", args[family]);
+    const {stdout} = execaSync("netstat", ["-rn", "-f", family === 4 ? "inet" : "inet6"]);
     return parse(stdout);
   };
-} else if (plat === "sunos" || (plat === "aix" && type() !== "OS400")) {
-  // AIX `netstat` output is compatible with Solaris
-  const args = {
-    v4: ["-rn", "-f", "inet"],
-    v6: ["-rn", "-f", "inet6"],
-  };
-
+} else if (plat === "sunos" || (plat === "aix" && type() !== "OS400")) { // AIX `netstat` output is compatible with Solaris
   const parse = stdout => {
     for (const line of (stdout || "").trim().split("\n")) {
       const results = line.split(/ +/) || [];
@@ -282,12 +246,12 @@ if (plat === "linux") {
   };
 
   promise = async family => {
-    const {stdout} = await execa("netstat", args[family]);
+    const {stdout} = await execa("netstat", ["-rn", "-f", family === 4 ? "inet" : "inet6"]);
     return parse(stdout);
   };
 
   sync = family => {
-    const {stdout} = execaSync("netstat", args[family]);
+    const {stdout} = execaSync("netstat", ["-rn", "-f", family === 4 ? "inet" : "inet6"]);
     return parse(stdout);
   };
 } else {
@@ -295,10 +259,10 @@ if (plat === "linux") {
   sync = (_) => { throw new Error("Unsupported Platform"); };
 }
 
-export const gateway4async = () => promise("v4");
-export const gateway6async = () => promise("v6");
-export const gateway4sync = () => sync("v4");
-export const gateway6sync = () => sync("v6");
+export const gateway4async = () => promise(4);
+export const gateway6async = () => promise(6);
+export const gateway4sync = () => sync(4);
+export const gateway6sync = () => sync(6);
 
 export default {
   gateway4async,
