@@ -168,7 +168,7 @@ if (plat === "linux") {
 } else if (plat === "freebsd") {
   const parse = (stdout, family) => {
     for (const line of (stdout || "").trim().split("\n")) {
-      const [target, gateway, _, iface] = line.split(/ +/) || [];
+      const [target, gateway, _2, iface] = line.split(/ +/) || [];
       if (dests.has(target) && gateway && isIP(gateway)) {
         return {gateway, version: family, int: (iface ?? null)};
       }
@@ -211,10 +211,7 @@ if (plat === "linux") {
 } else if (plat === "openbsd") {
   const parse = (stdout, family) => {
     for (const line of (stdout || "").trim().split("\n")) {
-      const results = line.split(/ +/) || [];
-      const target = results[0];
-      const gateway = results[1];
-      const iface = results[7];
+      const [target, gateway, _2, _3, _4, _5, _6, iface] = line.split(/ +/) || [];
       if (dests.has(target) && gateway && isIP(gateway)) {
         return {gateway, version: family, int: (iface ?? null)};
       }
@@ -234,10 +231,7 @@ if (plat === "linux") {
 } else if (plat === "sunos" || (plat === "aix" && type() !== "OS400")) { // AIX `netstat` output is compatible with Solaris
   const parse = (stdout, family) => {
     for (const line of (stdout || "").trim().split("\n")) {
-      const results = line.split(/ +/) || [];
-      const target = results[0];
-      const gateway = results[1];
-      const iface = results[5];
+      const [target, gateway, _2, _3, _4, iface] = line.split(/ +/) || [];
       if (dests.has(target) && gateway && isIP(gateway)) {
         return {gateway, version: family, int: (iface ?? null)};
       }
