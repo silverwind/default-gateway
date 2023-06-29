@@ -18,10 +18,11 @@
     "execa": "^7.1.1"
   },
   "devDependencies": {
-    "eslint": "8.42.0",
-    "eslint-config-silverwind": "73.0.2",
-    "updates": "14.1.1",
+    "eslint": "8.43.0",
+    "eslint-config-silverwind": "73.0.4",
+    "updates": "14.2.9",
     "versions": "11.0.1",
-    "vitest": "0.32.0"
+    "vitest": "0.32.2",
+    "vitest-config-silverwind": "2.0.0"
   }
 }
