@@ -8,6 +8,7 @@
   "type": "module",
   "sideEffects": false,
   "exports": "./index.js",
+  "packageManager": "pnpm@10.28.2",
   "engines": {
     "node": ">= 16"
   },
